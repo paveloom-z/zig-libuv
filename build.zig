@@ -2,7 +2,9 @@ const std = @import("std");
 
 const deps = @import("deps.zig");
 
-pub fn build(b: *std.build.Builder) void {
+pub fn build(b: *std.build.Builder) !void {
+    // Add standard target options
+    const target = b.standardTargetOptions(.{});
     // Add standard release options
     const mode = b.standardReleaseOptions();
     // Add the library
@@ -15,8 +17,37 @@ pub fn build(b: *std.build.Builder) void {
     unit_tests.setBuildMode(mode);
     unit_tests_step.dependOn(&unit_tests.step);
     unit_tests.test_evented_io = true;
+    // Add test executables
+    const timer = b.addExecutable("timer", "examples/timer.zig");
+    timer.setTarget(target);
+    timer.setBuildMode(mode);
+    timer.install();
+    // Define the library package
+    const libuv_pkg = std.build.Pkg{
+        .name = "libuv",
+        .source = .{ .path = "src/lib.zig" },
+        .dependencies = &.{},
+    };
+    // For each example
+    inline for (.{timer}) |step| {
+        // Add the library package
+        step.addPackage(libuv_pkg);
+        // Add a run step
+        const run_step_name = try std.mem.concat(
+            b.allocator,
+            u8,
+            &.{ "Run the `", step.name, "` example" },
+        );
+        const run_step = b.step(step.name, run_step_name);
+        const run_cmd = step.run();
+        run_cmd.step.dependOn(b.getInstallStep());
+        if (b.args) |args| {
+            run_cmd.addArgs(args);
+        }
+        run_step.dependOn(&run_cmd.step);
+    }
     // Add the dependencies
-    inline for (.{ lib, unit_tests }) |step| {
+    inline for (.{ lib, unit_tests, timer }) |step| {
         inline for (@typeInfo(deps.package_data).Struct.decls) |decl| {
             const pkg = @field(deps.package_data, decl.name);
             // Add the include paths
