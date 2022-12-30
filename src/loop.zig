@@ -15,6 +15,8 @@ pub const Loop = struct {
     };
     /// A wrapped `libuv`'s event loop
     uv_loop: *c.uv_loop_t,
+    /// Space for user-defined arbitrary data
+    data: ?*anyopaque = null,
     /// An allocator
     allocator: std.mem.Allocator,
     /// Initialize the loop

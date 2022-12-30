@@ -13,6 +13,8 @@ pub const Timer = struct {
     pub const Callback = c.uv_timer_cb;
     /// A wrapped `libuv`'s timer handle
     handle: Handle,
+    /// Space for user-defined arbitrary data
+    data: ?*anyopaque = null,
     /// Initialize the handle
     pub fn init(loop: *Loop) !Self {
         // Prepare a pointer for the handle

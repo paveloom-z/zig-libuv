@@ -10,6 +10,8 @@ pub fn Handle(comptime T: type) type {
         pub const CloseCallback = c.uv_close_cb;
         /// A specific `libuv` handle
         uv_handle: T,
+        /// Space for user-defined arbitrary data
+        data: ?*anyopaque = null,
         /// Cast a pointer to the specific handle
         /// to a pointer to the base handle
         pub inline fn toBase(uv_handle: *T) *UVHandle {
@@ -19,11 +21,11 @@ pub fn Handle(comptime T: type) type {
         pub fn close(self: *Self, close_cb: CloseCallback) void {
             c.uv_close(toBase(&self.uv_handle), close_cb);
         }
-        /// Return `handle->data`
+        /// Return `uv_handle->data`
         pub fn get_data(self: *const Self) ?*anyopaque {
             c.uv_handle_get_data(toBase(&self.uv_handle));
         }
-        /// Set `handle->data`
+        /// Set `uv_handle->data`
         pub fn set_data(self: *Self, data: ?*anyopaque) void {
             c.uv_handle_set_data(toBase(&self.uv_handle), data);
         }
