@@ -1,0 +1,55 @@
+id: epcocwwj699ioorm5azr1633k642ax0svapyhwfrat8sdn1m
+name: libuv
+main: src/lib.zig
+license: MIT
+description: Zig bindings for the `libuv` library
+dependencies:
+  - src: git https://github.com/libuv/libuv tag-v1.44.2
+    only-os: linux
+    c_include_dirs:
+      - include
+      - src
+      - src/unix
+    c_source_flags:
+      - -D_FILE_OFFSET_BITS=64
+      - -D_GNU_SOURCE
+      - -D_LARGEFILE_SOURCE
+      - -D_POSIX_C_SOURCE=200112
+    c_source_files:
+      - src/fs-poll.c
+      - src/idna.c
+      - src/inet.c
+      - src/random.c
+      - src/strscpy.c
+      - src/strtok.c
+      - src/threadpool.c
+      - src/timer.c
+      - src/unix/async.c
+      - src/unix/core.c
+      - src/unix/dl.c
+      - src/unix/epoll.c
+      - src/unix/fs.c
+      - src/unix/getaddrinfo.c
+      - src/unix/getnameinfo.c
+      - src/unix/linux-core.c
+      - src/unix/linux-inotify.c
+      - src/unix/linux-syscalls.c
+      - src/unix/loop-watcher.c
+      - src/unix/loop.c
+      - src/unix/pipe.c
+      - src/unix/poll.c
+      - src/unix/process.c
+      - src/unix/procfs-exepath.c
+      - src/unix/proctitle.c
+      - src/unix/random-devurandom.c
+      - src/unix/random-getrandom.c
+      - src/unix/random-sysctl-linux.c
+      - src/unix/signal.c
+      - src/unix/stream.c
+      - src/unix/tcp.c
+      - src/unix/thread.c
+      - src/unix/tty.c
+      - src/unix/udp.c
+      - src/uv-common.c
+      - src/uv-data-getter-setters.c
+      - src/version.c
