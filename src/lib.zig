@@ -8,6 +8,8 @@ pub const Loop = @import("loop.zig").Loop;
 pub const Timer = @import("timer.zig").Timer;
 pub const check = @import("error.zig").check;
 pub const dns = @import("dns.zig");
+pub const misc = @import("misc.zig");
+pub const utils = @import("utils.zig");
 
 test {
     // Reference nested container tests
