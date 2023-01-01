@@ -13,12 +13,12 @@ pub const Loop = struct {
         ONCE = c.UV_RUN_ONCE,
         NOWAIT = c.UV_RUN_NOWAIT,
     };
-    /// A wrapped `libuv`'s event loop
+    /// `libuv`'s event loop
     uv_loop: *c.uv_loop_t,
     /// Space for user-defined arbitrary data
     data: ?*anyopaque = null,
     /// An allocator
-    allocator: std.mem.Allocator,
+    allocator: std.mem.Allocator = undefined,
     /// Initialize the loop
     pub fn init(allocator: std.mem.Allocator) !Self {
         // Allocate the memory for the loop
@@ -32,10 +32,11 @@ pub const Loop = struct {
             .allocator = allocator,
         };
     }
-    /// Close the loop
-    pub fn close(self: *Self) !void {
-        const res = c.uv_loop_close(self.uv_loop);
-        try check(res);
+    /// Return the initialized default loop
+    pub fn default() Self {
+        return Self{
+            .uv_loop = c.uv_default_loop(),
+        };
     }
     /// Run the loop
     pub fn run(self: *Self, run_mode: RunMode) !void {
@@ -49,6 +50,11 @@ pub const Loop = struct {
     /// Stop the loop
     pub fn stop(self: *Self) void {
         c.uv_stop(self.uv_loop);
+    }
+    /// Close the loop
+    pub fn close(self: *Self) !void {
+        const res = c.uv_loop_close(self.uv_loop);
+        try check(res);
     }
     /// Free the memory allocated to the loop
     pub fn deinit(self: *Self) void {

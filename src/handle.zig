@@ -8,7 +8,7 @@ pub fn Handle(comptime T: type) type {
         const Self = @This();
         pub const UVHandle = c.uv_handle_t;
         pub const CloseCallback = c.uv_close_cb;
-        /// A specific `libuv` handle
+        /// A specific `libuv`'s handle
         uv_handle: T,
         /// Space for user-defined arbitrary data
         data: ?*anyopaque = null,

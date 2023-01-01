@@ -11,7 +11,7 @@ pub const Timer = struct {
     pub const UVHandle = c.uv_timer_t;
     pub const Handle = @import("handle.zig").Handle(UVHandle);
     pub const Callback = c.uv_timer_cb;
-    /// A wrapped `libuv`'s timer handle
+    /// A wrapped handle
     handle: Handle,
     /// Space for user-defined arbitrary data
     data: ?*anyopaque = null,
@@ -63,7 +63,7 @@ pub const Timer = struct {
 };
 
 /// A callback for the test
-fn testCallback(handle: ?*c.uv_timer_t) callconv(.C) void {
+fn testCallback(handle: ?*Timer.UVHandle) callconv(.C) void {
     _ = handle;
 }
 
