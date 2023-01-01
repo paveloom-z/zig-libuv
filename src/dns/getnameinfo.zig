@@ -2,11 +2,11 @@ const std = @import("std");
 
 const lib = @import("../lib.zig");
 
-const c = lib.c;
+const Cast = lib.Cast;
 const Loop = lib.Loop;
+const c = lib.c;
 const check = lib.check;
 const misc = lib.misc;
-const utils = lib.utils;
 
 /// `getnameinfo` request type
 pub const GetNameInfo = struct {
@@ -24,6 +24,7 @@ pub const GetNameInfo = struct {
     host: [1025]u8,
     service: [32]u8,
     retcode: c_int,
+    usingnamespace Cast(Self);
     /// Call `getnameinfo` asynchronously
     pub fn getnameinfo(
         self: *Self,
@@ -34,7 +35,7 @@ pub const GetNameInfo = struct {
     ) !void {
         const res = c.uv_getnameinfo(
             loop.uv_loop,
-            utils.toUV(Self, self),
+            self.toUV(),
             cb,
             addr,
             flags,

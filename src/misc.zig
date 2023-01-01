@@ -1,8 +1,9 @@
 const std = @import("std");
 
-const c = @import("c.zig").c;
+const lib = @import("lib.zig");
 
-const check = @import("error.zig").check;
+const c = lib.c;
+const check = lib.check;
 
 /// Convert a binary structure containing an IPv4 address to a string
 pub fn ip4Name(src: *const c.struct_sockaddr_in, slice: []u8) !void {

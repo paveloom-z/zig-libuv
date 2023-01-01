@@ -26,7 +26,7 @@ See `zig build --help` for more build options, including how to run examples.
 
 #### Integrate
 
-To integrate Tracy in your project:
+To integrate the bindings into your project:
 
 1) Add this repository as a dependency in `zigmod.yml`:
 

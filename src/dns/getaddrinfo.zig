@@ -2,11 +2,11 @@ const std = @import("std");
 
 const lib = @import("../lib.zig");
 
-const c = lib.c;
+const Cast = lib.Cast;
 const Loop = lib.Loop;
+const c = lib.c;
 const check = lib.check;
 const misc = lib.misc;
-const utils = lib.utils;
 
 /// `addrinfo` struct
 pub const AddrInfo = extern struct {
@@ -20,9 +20,10 @@ pub const AddrInfo = extern struct {
     ai_addr: [*c]c.struct_sockaddr,
     ai_canonname: [*c]u8,
     ai_next: [*c]c.struct_addrinfo,
+    usingnamespace Cast(Self);
     /// Free the struct
     pub fn free(self: *Self) void {
-        c.uv_freeaddrinfo(utils.toUV(Self, self));
+        c.uv_freeaddrinfo(self.toUV());
     }
 };
 
@@ -42,6 +43,7 @@ pub const GetAddrInfo = extern struct {
     service: [*c]u8,
     addrinfo: [*c]c.struct_addrinfo,
     retcode: c_int,
+    usingnamespace Cast(Self);
     /// Call `getaddrinfo` asynchronously
     pub fn getaddrinfo(
         self: *Self,
@@ -53,11 +55,11 @@ pub const GetAddrInfo = extern struct {
     ) !void {
         const res = c.uv_getaddrinfo(
             loop.uv_loop,
-            utils.toUV(Self, self),
+            self.toUV(),
             cb,
             node,
             service,
-            utils.toUV(AddrInfo, hints),
+            AddrInfo.toUV(hints),
         );
         try check(res);
     }
@@ -67,7 +69,7 @@ pub const GetAddrInfo = extern struct {
 pub fn gotAddrInfo(
     uv_getaddrinfo: ?*GetAddrInfo.UV,
     status: c_int,
-    uv_res: ?*AddrInfo.UV,
+    maybe_uv_res: ?*AddrInfo.UV,
 ) callconv(.C) void {
     _ = uv_getaddrinfo;
     // Check the status
@@ -75,7 +77,7 @@ pub fn gotAddrInfo(
     // Cast the pointer to the result to get the sweet methods
     //
     // Also, assert we actually got a matching network address
-    const res = utils.fromUV(AddrInfo, uv_res).?;
+    const res = AddrInfo.fromUV(maybe_uv_res).?;
     defer res.free();
     // Get the IP4 address
     var buffer = [_]u8{0} ** 11;

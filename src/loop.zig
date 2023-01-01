@@ -1,8 +1,9 @@
 const std = @import("std");
 
-const c = @import("c.zig").c;
+const lib = @import("lib.zig");
 
-const check = @import("error.zig").check;
+const c = lib.c;
+const check = lib.check;
 
 /// An event loop
 pub const Loop = struct {

@@ -3,20 +3,21 @@ const std = @import("std");
 const libuv = @import("libuv");
 
 /// A callback for the timer
-fn timerCallback(maybe_handle: ?*libuv.Timer.UVHandle) callconv(.C) void {
-    if (maybe_handle) |handle| {
-        if (handle.data) |handle_data| {
-            const timer = @ptrCast(*align(1) libuv.Timer, handle_data);
-            if (timer.data) |timer_data| {
-                const count = @ptrCast(*align(1) usize, timer_data);
-                count.* += 1;
-                std.debug.print("{}!\n", .{count.*});
-                if (count.* == 10) {
-                    std.debug.print("Goodbye!\n", .{});
-                    timer.handle.close(null);
-                }
-            }
-        }
+fn timerCallback(maybe_uv_handle: ?*libuv.Timer.UV) callconv(.C) void {
+    // Wrap the handle
+    const maybe_handle = libuv.Timer.fromUV(maybe_uv_handle);
+    // Assert we actually got a handle
+    const handle = maybe_handle.?;
+    // Assert this handle has the data
+    const data = handle.data.?;
+    // Cast the pointer
+    const count = @ptrCast(*align(1) usize, data);
+    // Do the logic
+    count.* += 1;
+    std.debug.print("{}!\n", .{count.*});
+    if (count.* == 10) {
+        std.debug.print("Goodbye!\n", .{});
+        handle.close(null);
     }
 }
 
@@ -31,7 +32,6 @@ pub fn main() !void {
     // data just for these sweet methods in the callback
     var count: usize = 0;
     timer.data = &count;
-    timer.handle.set_data(&timer);
     // Count to 10, then say goodbye
     try timer.start(timerCallback, 0, 250);
     // Run the loop

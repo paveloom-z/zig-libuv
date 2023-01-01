@@ -1,4 +1,4 @@
 // Import the `libuv` library
-pub const c = @cImport({
+pub usingnamespace @cImport({
     @cInclude("uv.h");
 });

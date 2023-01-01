@@ -1,69 +1,82 @@
 const std = @import("std");
 
-const c = @import("c.zig").c;
+const lib = @import("lib.zig");
 
-const Loop = @import("loop.zig").Loop;
-const check = @import("error.zig").check;
+const Cast = lib.Cast;
+const Loop = lib.Loop;
+const c = lib.c;
+const check = lib.check;
+
+const HandleDecls = @import("handle.zig").HandleDecls;
 
 /// Timer handle
 pub const Timer = struct {
     const Self = @This();
-    pub const UVHandle = c.uv_timer_t;
-    pub const Handle = @import("handle.zig").Handle(UVHandle);
+    pub const UV = c.uv_timer_t;
     pub const Callback = c.uv_timer_cb;
-    /// A wrapped handle
-    handle: Handle,
-    /// Space for user-defined arbitrary data
-    data: ?*anyopaque = null,
+    data: ?*anyopaque,
+    loop: [*c]c.uv_loop_t,
+    type: c.uv_handle_type,
+    close_cb: c.uv_close_cb,
+    handle_queue: [2]?*anyopaque,
+    u: extern union {
+        fd: c_int,
+        reserved: [4]?*anyopaque,
+    },
+    next_closing: [*c]c.uv_handle_t,
+    flags: c_uint,
+    timer_cb: c.uv_timer_cb,
+    heap_node: [3]?*anyopaque,
+    timeout: u64,
+    repeat: u64,
+    start_id: u64,
+    usingnamespace Cast(Self);
+    usingnamespace HandleDecls;
     /// Initialize the handle
     pub fn init(loop: *Loop) !Self {
         // Prepare a pointer for the handle
-        var uv_timer: c.uv_timer_t = undefined;
+        var self: Self = undefined;
         // Initialize the handle
-        const res = c.uv_timer_init(loop.uv_loop, &uv_timer);
+        const res = c.uv_timer_init(loop.uv_loop, self.toUV());
         try check(res);
         // Return the handle
-        return Self{
-            .handle = Handle{
-                .uv_handle = uv_timer,
-            },
-        };
+        return self;
     }
     /// Start the timer
     ///
     /// `timeout` and `repeat` are in milliseconds.
     pub fn start(self: *Self, cb: Callback, timeout: u64, repeat: u64) !void {
-        const res = c.uv_timer_start(&self.handle.uv_handle, cb, timeout, repeat);
+        const res = c.uv_timer_start(self.toUV(), cb, timeout, repeat);
         try check(res);
     }
     /// Stop the timer
     pub fn stop(self: *Self) !void {
-        const res = c.uv_timer_stop(&self.handle.uv_handle);
+        const res = c.uv_timer_stop(self.toUV());
         try check(res);
     }
     /// Restart the timer
     pub fn again(self: *Self) !void {
-        const res = c.uv_timer_again(&self.handle.uv_handle);
+        const res = c.uv_timer_again(self.toUV());
         try check(res);
     }
     /// Set the repeat interval value in milliseconds
     pub fn set_repeat(self: *Self, repeat: u64) void {
-        c.uv_timer_set_repeat(&self.handle.uv_handle, repeat);
+        c.uv_timer_set_repeat(self.toUV(), repeat);
     }
     /// Get the timer repeat value
     pub fn get_repeat(self: *Self) u64 {
-        return c.uv_timer_get_repeat(&self.handle.uv_handle);
+        return c.uv_timer_get_repeat(self.toUV());
     }
     /// Get the timer due value or 0 if it has expired
     ///
     /// The time is relative to `Loop.now`.
     pub fn get_due_in(self: *Self) u64 {
-        return c.uv_timer_get_due_in(&self.handle.uv_handle);
+        return c.uv_timer_get_due_in(self.toUV());
     }
 };
 
 /// A callback for the test
-fn testCallback(handle: ?*Timer.UVHandle) callconv(.C) void {
+fn testCallback(handle: ?*Timer.UV) callconv(.C) void {
     _ = handle;
 }
 
@@ -78,7 +91,7 @@ test "Timer" {
     // Run the loop
     try loop.run(Loop.RunMode.DEFAULT);
     // Request to stop the timer
-    timer.handle.close(null);
+    timer.close(null);
     // Check whether the loop is alive
     try std.testing.expect(loop.isAlive());
     // Run the loop again to accomplish that request
