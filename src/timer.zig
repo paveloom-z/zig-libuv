@@ -13,7 +13,7 @@ const HandleDecls = @import("handle.zig").HandleDecls;
 pub const Timer = struct {
     const Self = @This();
     pub const UV = c.uv_timer_t;
-    pub const Callback = c.uv_timer_cb;
+    pub const TimerCallback = c.uv_timer_cb;
     data: ?*anyopaque,
     loop: [*c]c.uv_loop_t,
     type: c.uv_handle_type,
@@ -45,7 +45,7 @@ pub const Timer = struct {
     /// Start the timer
     ///
     /// `timeout` and `repeat` are in milliseconds.
-    pub fn start(self: *Self, cb: Callback, timeout: u64, repeat: u64) !void {
+    pub fn start(self: *Self, cb: TimerCallback, timeout: u64, repeat: u64) !void {
         const res = c.uv_timer_start(self.toUV(), cb, timeout, repeat);
         try check(res);
     }

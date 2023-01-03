@@ -2,14 +2,25 @@ const std = @import("std");
 
 pub const c = @import("c.zig");
 
-pub const Cast = @import("cast.zig").Cast;
-pub const Error = @import("error.zig").Error;
-pub const Handle = @import("handle.zig").Handle;
-pub const Loop = @import("loop.zig").Loop;
-pub const Timer = @import("timer.zig").Timer;
-pub const check = @import("error.zig").check;
+const @"error" = @import("error.zig");
+const cast = @import("cast.zig");
+const handle = @import("handle.zig");
+const loop = @import("loop.zig");
+const stream = @import("stream.zig");
+const timer = @import("timer.zig");
 pub const dns = @import("dns.zig");
 pub const misc = @import("misc.zig");
+
+pub const Cast = cast.Cast;
+pub const Connect = stream.Connect;
+pub const Error = @"error".Error;
+pub const Handle = handle.Handle;
+pub const Loop = loop.Loop;
+pub const Shutdown = stream.Shutdown;
+pub const Stream = stream.Stream;
+pub const Timer = timer.Timer;
+pub const Write = stream.Write;
+pub const check = @"error".check;
 
 test {
     // Reference nested container tests

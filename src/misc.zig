@@ -2,8 +2,18 @@ const std = @import("std");
 
 const lib = @import("lib.zig");
 
+const Cast = lib.Cast;
 const c = lib.c;
 const check = lib.check;
+
+/// Buffer data type
+pub const Buf = extern struct {
+    const Self = @This();
+    pub const UV = c.uv_buf_t;
+    base: [*c]u8,
+    len: usize,
+    usingnamespace Cast(Self);
+};
 
 /// Convert a binary structure containing an IPv4 address to a string
 pub fn ip4Name(src: *const c.struct_sockaddr_in, slice: []u8) !void {

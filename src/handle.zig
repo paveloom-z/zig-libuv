@@ -6,15 +6,6 @@ const Cast = lib.Cast;
 const c = lib.c;
 const utils = lib.utils;
 
-/// Define base handle declarations
-pub const HandleDecls = struct {
-    pub const CloseCallback = c.uv_close_cb;
-    /// Request handle to be closed
-    pub fn close(self: anytype, close_cb: CloseCallback) void {
-        c.uv_close(@ptrCast(*c.uv_handle_t, self), close_cb);
-    }
-};
-
 /// Base handle
 pub const Handle = extern struct {
     const Self = @This();
@@ -32,4 +23,14 @@ pub const Handle = extern struct {
     flags: c_uint,
     usingnamespace Cast(Self);
     usingnamespace HandleDecls;
+};
+
+/// Base handle declarations
+pub const HandleDecls = struct {
+    pub const AllocCallback = c.uv_alloc_cb;
+    pub const CloseCallback = c.uv_close_cb;
+    /// Request handle to be closed
+    pub fn close(handle: anytype, close_cb: CloseCallback) void {
+        c.uv_close(Handle.toUV(handle), close_cb);
+    }
 };
