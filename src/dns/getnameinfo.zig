@@ -34,7 +34,7 @@ pub const GetNameInfo = struct {
         flags: c_int,
     ) !void {
         const res = c.uv_getnameinfo(
-            loop.uv_loop,
+            loop.toUV(),
             self.toUV(),
             cb,
             addr,
@@ -72,15 +72,17 @@ pub fn gotNameInfo(
 }
 
 test "`getnameinfo`" {
+    const alloc = std.testing.allocator;
     // Initialize the loop
-    var loop = try Loop.init(std.testing.allocator);
-    defer loop.deinit();
+    var loop = try alloc.create(Loop);
+    try Loop.init(loop);
+    defer alloc.destroy(loop);
     // Prepare an address
     var sockaddr: c.sockaddr_in = undefined;
     misc.ip4Addr("127.0.0.1", 80, &sockaddr) catch unreachable;
     // Prepare a request
     var req: GetNameInfo = undefined;
-    try req.getnameinfo(&loop, gotNameInfo, @ptrCast(*const c.sockaddr, &sockaddr), 0);
+    try req.getnameinfo(loop, gotNameInfo, @ptrCast(*const c.sockaddr, &sockaddr), 0);
     // Run the loop
     try loop.run(Loop.RunMode.DEFAULT);
     // Close the loop

@@ -54,7 +54,7 @@ pub const GetAddrInfo = extern struct {
         hints: ?*AddrInfo,
     ) !void {
         const res = c.uv_getaddrinfo(
-            loop.uv_loop,
+            loop.toUV(),
             self.toUV(),
             cb,
             node,
@@ -94,9 +94,11 @@ pub fn gotAddrInfo(
 }
 
 test "`getaddrinfo`" {
+    const alloc = std.testing.allocator;
     // Initialize the loop
-    var loop = try Loop.init(std.testing.allocator);
-    defer loop.deinit();
+    var loop = try alloc.create(Loop);
+    try Loop.init(loop);
+    defer alloc.destroy(loop);
     // Prepare hints
     var hints: AddrInfo = undefined;
     hints.ai_family = c.AF_INET;
@@ -106,7 +108,7 @@ test "`getaddrinfo`" {
     // Prepare a request
     var req: GetAddrInfo = undefined;
     const hostname = @ptrCast(*const u8, "localhost");
-    try req.getaddrinfo(&loop, gotAddrInfo, hostname, null, &hints);
+    try req.getaddrinfo(loop, gotAddrInfo, hostname, null, &hints);
     // Run the loop
     try loop.run(Loop.RunMode.DEFAULT);
     // Close the loop

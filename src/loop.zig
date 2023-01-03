@@ -2,74 +2,111 @@ const std = @import("std");
 
 const lib = @import("lib.zig");
 
+const Cast = lib.Cast;
 const c = lib.c;
 const check = lib.check;
 
 /// An event loop
-pub const Loop = struct {
+pub const Loop = extern struct {
     const Self = @This();
+    pub const UV = c.uv_loop_t;
     /// Mode used to run the loop with
     pub const RunMode = enum(c_uint) {
         DEFAULT = c.UV_RUN_DEFAULT,
         ONCE = c.UV_RUN_ONCE,
         NOWAIT = c.UV_RUN_NOWAIT,
     };
-    /// `libuv`'s event loop
-    uv_loop: *c.uv_loop_t,
-    /// Space for user-defined arbitrary data
-    data: ?*anyopaque = null,
-    /// An allocator
-    allocator: std.mem.Allocator = undefined,
+    data: ?*anyopaque,
+    active_handles: c_uint,
+    handle_queue: [2]?*anyopaque,
+    active_reqs: extern union {
+        unused: ?*anyopaque,
+        count: c_uint,
+    },
+    internal_fields: ?*anyopaque,
+    stop_flag: c_uint,
+    flags: c_ulong,
+    backend_fd: c_int,
+    pending_queue: [2]?*anyopaque,
+    watcher_queue: [2]?*anyopaque,
+    watchers: [*c][*c]c.uv__io_t,
+    nwatchers: c_uint,
+    nfds: c_uint,
+    wq: [2]?*anyopaque,
+    wq_mutex: c.uv_mutex_t,
+    wq_async: c.uv_async_t,
+    cloexec_lock: c.uv_rwlock_t,
+    closing_handles: [*c]c.uv_handle_t,
+    process_handles: [2]?*anyopaque,
+    prepare_handles: [2]?*anyopaque,
+    check_handles: [2]?*anyopaque,
+    idle_handles: [2]?*anyopaque,
+    async_handles: [2]?*anyopaque,
+    async_unused: ?*const fn () callconv(.C) void,
+    async_io_watcher: c.uv__io_t,
+    async_wfd: c_int,
+    timer_heap: extern struct {
+        min: ?*anyopaque,
+        nelts: c_uint,
+    },
+    timer_counter: u64,
+    time: u64,
+    signal_pipefd: [2]c_int,
+    signal_io_watcher: c.uv__io_t,
+    child_watcher: c.uv_signal_t,
+    emfile_fd: c_int,
+    inotify_read_watcher: c.uv__io_t,
+    inotify_watchers: ?*anyopaque,
+    inotify_fd: c_int,
+    usingnamespace Cast(Self);
     /// Initialize the loop
-    pub fn init(allocator: std.mem.Allocator) !Self {
-        // Allocate the memory for the loop
-        var uv_loop = try allocator.create(c.uv_loop_t);
-        // Initialize the loop
-        const res = c.uv_loop_init(uv_loop);
+    pub fn init(loop: *Self) !void {
+        const res = c.uv_loop_init(loop.toUV());
         try check(res);
-        // Return the loop
-        return Self{
-            .uv_loop = uv_loop,
-            .allocator = allocator,
-        };
     }
     /// Return the initialized default loop
-    pub fn default() Self {
-        return Self{
-            .uv_loop = c.uv_default_loop(),
-        };
+    pub fn default() ?*Self {
+        return Self.fromUV(c.uv_default_loop());
     }
     /// Run the loop
     pub fn run(self: *Self, run_mode: RunMode) !void {
-        const res = c.uv_run(self.uv_loop, @enumToInt(run_mode));
+        const res = c.uv_run(self.toUV(), @enumToInt(run_mode));
         try check(res);
     }
     /// Check if the loop is alive
     pub fn isAlive(self: *Self) bool {
-        return c.uv_loop_alive(self.uv_loop) != 0;
+        return c.uv_loop_alive(self.toUV()) != 0;
     }
     /// Stop the loop
     pub fn stop(self: *Self) void {
-        c.uv_stop(self.uv_loop);
+        c.uv_stop(self.toUV());
     }
     /// Close the loop
     pub fn close(self: *Self) !void {
-        const res = c.uv_loop_close(self.uv_loop);
+        const res = c.uv_loop_close(self.toUV());
         try check(res);
-    }
-    /// Free the memory allocated to the loop
-    pub fn deinit(self: *Self) void {
-        // Free the memory
-        self.allocator.destroy(self.uv_loop);
-        self.* = undefined;
     }
 };
 
-// Test an empty loop for memory leaks
 test "Loop" {
+    const alloc = std.testing.allocator;
     // Initialize the loop
-    var loop = try Loop.init(std.testing.allocator);
-    defer loop.deinit();
+    var loop = try alloc.create(Loop);
+    try Loop.init(loop);
+    defer alloc.destroy(loop);
+    // Check whether the loop is alive
+    try std.testing.expect(!loop.isAlive());
+    // Run the loop
+    try loop.run(Loop.RunMode.DEFAULT);
+    // Check whether the loop is alive
+    try std.testing.expect(!loop.isAlive());
+    // Close the loop
+    try loop.close();
+}
+
+test "Loop (default)" {
+    // Assert we can get the default loop
+    var loop = Loop.default().?;
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Run the loop

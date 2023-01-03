@@ -37,7 +37,7 @@ pub const Timer = struct {
         // Prepare a pointer for the handle
         var self: Self = undefined;
         // Initialize the handle
-        const res = c.uv_timer_init(loop.uv_loop, self.toUV());
+        const res = c.uv_timer_init(loop.toUV(), self.toUV());
         try check(res);
         // Return the handle
         return self;
@@ -81,11 +81,13 @@ fn testCallback(handle: ?*Timer.UV) callconv(.C) void {
 }
 
 test "Timer" {
+    const alloc = std.testing.allocator;
     // Initialize the loop
-    var loop = try Loop.init(std.testing.allocator);
-    defer loop.deinit();
+    var loop = try alloc.create(Loop);
+    try Loop.init(loop);
+    defer alloc.destroy(loop);
     // Initialize a timer
-    var timer = try Timer.init(&loop);
+    var timer = try Timer.init(loop);
     // Start the timer
     try timer.start(testCallback, 0, 0);
     // Run the loop

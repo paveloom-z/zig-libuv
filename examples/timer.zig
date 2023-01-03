@@ -23,11 +23,13 @@ fn timerCallback(maybe_uv_handle: ?*libuv.Timer.UV) callconv(.C) void {
 
 /// Run the program
 pub fn main() !void {
+    const alloc = std.heap.page_allocator;
     // Initialize the loop
-    var loop = try libuv.Loop.init(std.heap.page_allocator);
-    defer loop.deinit();
+    var loop = try alloc.create(libuv.Loop);
+    try libuv.Loop.init(loop);
+    defer alloc.destroy(loop);
     // Initialize a timer
-    var timer = try libuv.Timer.init(&loop);
+    var timer = try libuv.Timer.init(loop);
     // We use the double `baton` approach here to store user
     // data just for these sweet methods in the callback
     var count: usize = 0;

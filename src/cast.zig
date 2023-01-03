@@ -8,12 +8,18 @@ pub fn Cast(comptime T: type) type {
     return struct {
         /// Cast the pointer to a Zig struct to a pointer to a C struct
         pub inline fn toUV(ptr: anytype) ?*T.UV {
-            if (@TypeOf(ptr) != ?*T and @TypeOf(ptr) != *T) @compileError("Wrong argument");
+            if (@TypeOf(ptr) != ?*T and
+                @TypeOf(ptr) != *T and
+                @TypeOf(ptr) != [*c]T)
+                @compileError("Wrong argument");
             return @ptrCast(?*T.UV, ptr);
         }
         /// Cast the pointer to a C struct to a pointer to a Zig struct
         pub inline fn fromUV(ptr: anytype) ?*T {
-            if (@TypeOf(ptr) != ?*T.UV and @TypeOf(ptr) != *T.UV) @compileError("Wrong argument");
+            if (@TypeOf(ptr) != ?*T.UV and
+                @TypeOf(ptr) != *T.UV and
+                @TypeOf(ptr) != [*c]T.UV)
+                @compileError("Wrong argument");
             return @ptrCast(?*T, ptr);
         }
     };
