@@ -6,32 +6,14 @@ const Cast = lib.Cast;
 const Loop = lib.Loop;
 const c = lib.c;
 const check = lib.check;
+const dns = lib.dns;
 const misc = lib.misc;
-
-/// `addrinfo` struct
-pub const AddrInfo = extern struct {
-    const Self = @This();
-    pub const UV = c.struct_addrinfo;
-    ai_flags: c_int,
-    ai_family: c_int,
-    ai_socktype: c_int,
-    ai_protocol: c_int,
-    ai_addrlen: c.socklen_t,
-    ai_addr: [*c]c.struct_sockaddr,
-    ai_canonname: [*c]u8,
-    ai_next: [*c]c.struct_addrinfo,
-    usingnamespace Cast(Self);
-    /// Free the struct
-    pub fn free(self: *Self) void {
-        c.uv_freeaddrinfo(self.toUV());
-    }
-};
 
 /// `getaddrinfo` request type
 pub const GetAddrInfo = extern struct {
     const Self = @This();
     pub const UV = c.uv_getaddrinfo_t;
-    pub const Callback = c.uv_getaddrinfo_cb;
+    pub const Callback = ?fn (?*GetAddrInfo, c_int, ?*dns.AddrInfo) callconv(.C) void;
     data: ?*anyopaque,
     type: c.uv_req_type,
     reserved: [6]?*anyopaque,
@@ -51,40 +33,35 @@ pub const GetAddrInfo = extern struct {
         cb: Callback,
         node: ?*const u8,
         service: ?*const u8,
-        hints: ?*AddrInfo,
+        hints: ?*dns.AddrInfo,
     ) !void {
         const res = c.uv_getaddrinfo(
             loop.toUV(),
             self.toUV(),
-            cb,
+            @ptrCast(c.uv_getaddrinfo_cb, cb),
             node,
             service,
-            AddrInfo.toUV(hints),
+            dns.AddrInfo.toUV(hints),
         );
         try check(res);
     }
 };
 
 /// A `getaddrinfo` callback for the test
-pub fn gotAddrInfo(
-    uv_getaddrinfo: ?*GetAddrInfo.UV,
+fn gotAddrInfo(
+    uv_getaddrinfo: ?*GetAddrInfo,
     status: c_int,
-    maybe_uv_res: ?*AddrInfo.UV,
+    maybe_uv_res: ?*dns.AddrInfo,
 ) callconv(.C) void {
     _ = uv_getaddrinfo;
     // Check the status
     check(status) catch unreachable;
-    // Cast the pointer to the result to get the sweet methods
-    //
-    // Also, assert we actually got a matching network address
-    const res = AddrInfo.fromUV(maybe_uv_res).?;
+    // Assert we actually got a matching network address
+    const res = maybe_uv_res.?;
     defer res.free();
     // Get the IP4 address
     var buffer = [_]u8{0} ** 11;
-    misc.ip4Name(
-        @ptrCast(*const c.sockaddr_in, @alignCast(@alignOf(c.sockaddr_in), res.ai_addr)),
-        buffer[0..10],
-    ) catch unreachable;
+    misc.ip4Name(res.ai_addr.asIn(), buffer[0..10]) catch unreachable;
     // Check whether the address is correct
     std.debug.assert(std.mem.eql(
         u8,
@@ -100,7 +77,7 @@ test "`getaddrinfo`" {
     try Loop.init(loop);
     defer alloc.destroy(loop);
     // Prepare hints
-    var hints: AddrInfo = undefined;
+    var hints: dns.AddrInfo = undefined;
     hints.ai_family = c.AF_INET;
     hints.ai_socktype = c.SOCK_STREAM;
     hints.ai_protocol = c.IPPROTO_TCP;

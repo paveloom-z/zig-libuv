@@ -4,11 +4,10 @@ const lib = @import("lib.zig");
 
 const Cast = lib.Cast;
 const Handle = lib.Handle;
+const HandleDecls = lib.HandleDecls;
 const c = lib.c;
 const check = lib.check;
 const misc = lib.misc;
-
-const HandleDecls = @import("handle.zig").HandleDecls;
 
 /// Stream handle
 pub const Stream = extern struct {
@@ -57,24 +56,24 @@ pub const StreamDecls = struct {
         try check(res);
     }
     /// Read data from an incoming stream
-    pub fn read_start(stream: anytype, alloc_cb: Handle.AllocCallback, read_cb: ReadCallback) !void {
+    pub fn readStart(stream: anytype, alloc_cb: Handle.AllocCallback, read_cb: ReadCallback) !void {
         const res = c.uv_read_start(Stream.toUV(stream), alloc_cb, read_cb);
         try check(res);
     }
     /// Stop reading data from the stream
-    pub fn read_stop(stream: anytype) !void {
+    pub fn readStop(stream: anytype) !void {
         const res = c.uv_read_stop(Stream.toUV(stream));
         try check(res);
     }
     /// Same as `Write.write`, but won’t queue a write
     /// request if it can’t be completed immediately
-    pub fn try_write(handle: anytype, bufs: *const misc.Buf, nbufs: c_uint) !c_int {
+    pub fn tryWrite(handle: anytype, bufs: *const misc.Buf, nbufs: c_uint) !c_int {
         const res = c.uv_try_write(handle.toUV(), bufs, nbufs);
         return try check(res);
     }
     /// Same as `Stream.try_write` and extended write function
     /// for sending handles over a pipe like `Write.write2`
-    pub fn try_write2(
+    pub fn tryWrite2(
         handle: anytype,
         bufs: *const misc.Buf,
         nbufs: c_uint,

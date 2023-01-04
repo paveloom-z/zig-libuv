@@ -1,11 +1,12 @@
 const std = @import("std");
 
-const getaddrinfo = @import("dns/getaddrinfo.zig");
-const getnameinfo = @import("dns/getnameinfo.zig");
+const types = @import("dns/types.zig");
 
-pub const AddrInfo = getaddrinfo.AddrInfo;
-pub const GetAddrInfo = getaddrinfo.GetAddrInfo;
-pub const GetNameInfo = getnameinfo.GetNameInfo;
+pub const AddrInfo = types.AddrInfo;
+pub const SockAddr = types.SockAddr;
+pub const SockAddrIn = types.SockAddrIn;
+pub const GetAddrInfo = @import("dns/getaddrinfo.zig").GetAddrInfo;
+pub const GetNameInfo = @import("dns/getnameinfo.zig").GetNameInfo;
 
 test {
     // Reference nested container tests

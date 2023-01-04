@@ -3,11 +3,10 @@ const std = @import("std");
 const lib = @import("lib.zig");
 
 const Cast = lib.Cast;
+const HandleDecls = lib.HandleDecls;
 const Loop = lib.Loop;
 const c = lib.c;
 const check = lib.check;
-
-const HandleDecls = @import("handle.zig").HandleDecls;
 
 /// Timer handle
 pub const Timer = struct {

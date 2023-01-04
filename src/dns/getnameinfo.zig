@@ -6,6 +6,7 @@ const Cast = lib.Cast;
 const Loop = lib.Loop;
 const c = lib.c;
 const check = lib.check;
+const dns = lib.dns;
 const misc = lib.misc;
 
 /// `getnameinfo` request type
@@ -30,14 +31,14 @@ pub const GetNameInfo = struct {
         self: *Self,
         loop: *Loop,
         cb: Callback,
-        addr: *const c.struct_sockaddr,
+        addr: *const dns.SockAddr,
         flags: c_int,
     ) !void {
         const res = c.uv_getnameinfo(
             loop.toUV(),
             self.toUV(),
             cb,
-            addr,
+            addr.toConstUV(),
             flags,
         );
         try check(res);
@@ -45,7 +46,7 @@ pub const GetNameInfo = struct {
 };
 
 /// A `getnameinfo` callback for the test
-pub fn gotNameInfo(
+fn gotNameInfo(
     uv_getaddrinfo: ?*GetNameInfo.UV,
     status: c_int,
     maybe_hostname: ?*const u8,
@@ -78,11 +79,11 @@ test "`getnameinfo`" {
     try Loop.init(loop);
     defer alloc.destroy(loop);
     // Prepare an address
-    var sockaddr: c.sockaddr_in = undefined;
-    misc.ip4Addr("127.0.0.1", 80, &sockaddr) catch unreachable;
+    var sockaddr_in: dns.SockAddrIn = undefined;
+    misc.ip4Addr("127.0.0.1", 80, &sockaddr_in) catch unreachable;
     // Prepare a request
     var req: GetNameInfo = undefined;
-    try req.getnameinfo(loop, gotNameInfo, @ptrCast(*const c.sockaddr, &sockaddr), 0);
+    try req.getnameinfo(loop, gotNameInfo, sockaddr_in.asAddr(), 0);
     // Run the loop
     try loop.run(Loop.RunMode.DEFAULT);
     // Close the loop
