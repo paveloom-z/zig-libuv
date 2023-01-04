@@ -4,6 +4,7 @@ const lib = @import("lib.zig");
 
 const Cast = lib.Cast;
 const c = lib.c;
+const misc = lib.misc;
 const utils = lib.utils;
 
 /// Base handle
@@ -27,10 +28,15 @@ pub const Handle = extern struct {
 
 /// Base handle declarations
 pub const HandleDecls = struct {
-    pub const AllocCallback = c.uv_alloc_cb;
-    pub const CloseCallback = c.uv_close_cb;
+    pub const AllocCallback = ?fn (anytype, usize, *misc.Buf) callconv(.C) void;
+    pub const AllocCallbackUV = c.uv_alloc_cb;
+    pub const CloseCallback = ?fn (anytype) callconv(.C) void;
+    pub const CloseCallbackUV = c.uv_close_cb;
     /// Request handle to be closed
     pub fn close(handle: anytype, close_cb: CloseCallback) void {
-        c.uv_close(Handle.toUV(handle), close_cb);
+        c.uv_close(
+            Handle.toUV(handle),
+            @ptrCast(CloseCallbackUV, close_cb),
+        );
     }
 };

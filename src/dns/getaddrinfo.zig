@@ -14,6 +14,7 @@ pub const GetAddrInfo = extern struct {
     const Self = @This();
     pub const UV = c.uv_getaddrinfo_t;
     pub const Callback = ?fn (?*GetAddrInfo, c_int, ?*dns.AddrInfo) callconv(.C) void;
+    pub const CallbackUV = c.uv_getaddrinfo_cb;
     data: ?*anyopaque,
     type: c.uv_req_type,
     reserved: [6]?*anyopaque,
@@ -38,7 +39,7 @@ pub const GetAddrInfo = extern struct {
         const res = c.uv_getaddrinfo(
             loop.toUV(),
             self.toUV(),
-            @ptrCast(c.uv_getaddrinfo_cb, cb),
+            @ptrCast(CallbackUV, cb),
             node,
             service,
             dns.AddrInfo.toUV(hints),
@@ -49,15 +50,15 @@ pub const GetAddrInfo = extern struct {
 
 /// A `getaddrinfo` callback for the test
 fn gotAddrInfo(
-    uv_getaddrinfo: ?*GetAddrInfo,
+    maybe_getaddrinfo: ?*GetAddrInfo,
     status: c_int,
-    maybe_uv_res: ?*dns.AddrInfo,
+    maybe_res: ?*dns.AddrInfo,
 ) callconv(.C) void {
-    _ = uv_getaddrinfo;
+    _ = maybe_getaddrinfo;
     // Check the status
     check(status) catch unreachable;
     // Assert we actually got a matching network address
-    const res = maybe_uv_res.?;
+    const res = maybe_res.?;
     defer res.free();
     // Get the IP4 address
     var buffer = [_]u8{0} ** 11;

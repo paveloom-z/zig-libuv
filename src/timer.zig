@@ -12,7 +12,8 @@ const check = lib.check;
 pub const Timer = struct {
     const Self = @This();
     pub const UV = c.uv_timer_t;
-    pub const TimerCallback = c.uv_timer_cb;
+    pub const TimerCallback = ?fn (*Self) callconv(.C) void;
+    pub const TimerCallbackUV = c.uv_timer_cb;
     data: ?*anyopaque,
     loop: [*c]c.uv_loop_t,
     type: c.uv_handle_type,
@@ -45,7 +46,12 @@ pub const Timer = struct {
     ///
     /// `timeout` and `repeat` are in milliseconds.
     pub fn start(self: *Self, cb: TimerCallback, timeout: u64, repeat: u64) !void {
-        const res = c.uv_timer_start(self.toUV(), cb, timeout, repeat);
+        const res = c.uv_timer_start(
+            self.toUV(),
+            @ptrCast(TimerCallbackUV, cb),
+            timeout,
+            repeat,
+        );
         try check(res);
     }
     /// Stop the timer
@@ -75,7 +81,7 @@ pub const Timer = struct {
 };
 
 /// A callback for the test
-fn testCallback(handle: ?*Timer.UV) callconv(.C) void {
+fn testCallback(handle: ?*Timer) callconv(.C) void {
     _ = handle;
 }
 

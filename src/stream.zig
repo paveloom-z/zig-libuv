@@ -43,11 +43,17 @@ pub const Stream = extern struct {
 
 /// Stream handle declarations
 pub const StreamDecls = struct {
-    pub const ConnectionCallback = c.uv_connection_cb;
-    pub const ReadCallback = c.uv_read_cb;
+    pub const ConnectionCallback = ?fn (anytype, c_int) callconv(.C) void;
+    pub const ConnectionCallbackUV = c.uv_connection_cb;
+    pub const ReadCallback = ?fn (anytype, isize, *const misc.Buf) callconv(.C) void;
+    pub const ReadCallbackUV = c.uv_read_cb;
     /// Start listening for incoming connections
     pub fn listen(stream: anytype, backlog: c_int, cb: ConnectionCallback) !void {
-        const res = c.uv_listen(Stream.toUV(stream), backlog, cb);
+        const res = c.uv_listen(
+            Stream.toUV(stream),
+            backlog,
+            @ptrCast(ConnectionCallbackUV, cb),
+        );
         try check(res);
     }
     /// Accept incoming connections
@@ -56,8 +62,16 @@ pub const StreamDecls = struct {
         try check(res);
     }
     /// Read data from an incoming stream
-    pub fn readStart(stream: anytype, alloc_cb: Handle.AllocCallback, read_cb: ReadCallback) !void {
-        const res = c.uv_read_start(Stream.toUV(stream), alloc_cb, read_cb);
+    pub fn readStart(
+        stream: anytype,
+        alloc_cb: Handle.AllocCallback,
+        read_cb: ReadCallback,
+    ) !void {
+        const res = c.uv_read_start(
+            Stream.toUV(stream),
+            @ptrCast(Handle.AllocCallbackUV, alloc_cb),
+            @ptrCast(ReadCallbackUV, read_cb),
+        );
         try check(res);
     }
     /// Stop reading data from the stream
@@ -114,7 +128,8 @@ pub const Connect = extern struct {
 pub const Shutdown = extern struct {
     const Self = @This();
     pub const UV = c.uv_shutdown_t;
-    pub const ShutdownCallback = c.uv_shutdown_cb;
+    pub const ShutdownCallback = ?fn (*Self, c_int) callconv(.C) void;
+    pub const ShutdownCallbackUV = c.uv_shutdown_cb;
     data: ?*anyopaque,
     type: c.uv_req_type,
     reserved: [6]?*anyopaque,
@@ -123,7 +138,7 @@ pub const Shutdown = extern struct {
     usingnamespace Cast(Self);
     /// Shutdown the outgoing (write) side of a duplex stream
     pub fn shutdown(req: *Self, handle: *Handle.UV, cb: ShutdownCallback) !void {
-        const res = c.uv_shutdown(req.toUV(), handle, cb);
+        const res = c.uv_shutdown(req.toUV(), handle, @ptrCast(ShutdownCallbackUV, cb));
         try check(res);
     }
 };
@@ -132,7 +147,8 @@ pub const Shutdown = extern struct {
 pub const Write = extern struct {
     const Self = @This();
     pub const UV = c.uv_write_t;
-    pub const WriteCallback = c.uv_write_cb;
+    pub const WriteCallback = ?fn (*Self, c_int) callconv(.C) void;
+    pub const WriteCallbackUV = c.uv_write_cb;
     data: ?*anyopaque,
     type: c.uv_req_type,
     reserved: [6]?*anyopaque,
@@ -159,7 +175,7 @@ pub const Write = extern struct {
             handle.toUV(),
             bufs.toUV(),
             nbufs,
-            cb,
+            @ptrCast(WriteCallbackUV, cb),
         );
         try check(res);
     }
@@ -178,7 +194,7 @@ pub const Write = extern struct {
             bufs.toUV(),
             nbufs,
             send_handle.toUV(),
-            cb,
+            @ptrCast(WriteCallbackUV, cb),
         );
         try check(res);
     }

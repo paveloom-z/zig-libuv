@@ -106,12 +106,20 @@ pub const TCP = extern struct {
         addr: *const dns.SockAddr,
         cb: Self.ConnectionCallback,
     ) !void {
-        const res = c.uv_tcp_connect(req.toUV(), self.toUV(), addr.toUV(), cb);
+        const res = c.uv_tcp_connect(
+            req.toUV(),
+            self.toUV(),
+            addr.toUV(),
+            @ptrCast(Self.ConnectionCallbackUV, cb),
+        );
         try check(res);
     }
     /// Reset a TCP connection by sending a RST packet
     pub fn closeReset(self: *Self, close_cb: Self.CloseCallback) !void {
-        const res = c.uv_tcp_close_reset(self.toUV(), close_cb);
+        const res = c.uv_tcp_close_reset(
+            self.toUV(),
+            @ptrCast(Self.CloseCallbackUV, close_cb),
+        );
         try check(res);
     }
     /// Create a pair of connected sockets with the specified properties

@@ -3,9 +3,7 @@ const std = @import("std");
 const libuv = @import("libuv");
 
 /// A callback for the timer
-fn timerCallback(maybe_uv_handle: ?*libuv.Timer.UV) callconv(.C) void {
-    // Wrap the handle
-    const maybe_handle = libuv.Timer.fromUV(maybe_uv_handle);
+fn timerCallback(maybe_handle: ?*libuv.Timer) callconv(.C) void {
     // Assert we actually got a handle
     const handle = maybe_handle.?;
     // Assert this handle has the data

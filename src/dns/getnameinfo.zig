@@ -13,7 +13,8 @@ const misc = lib.misc;
 pub const GetNameInfo = struct {
     const Self = @This();
     pub const UV = c.uv_getnameinfo_t;
-    pub const Callback = c.uv_getnameinfo_cb;
+    pub const Callback = ?fn (*Self, c_int, *const u8, *const u8) callconv(.C) void;
+    pub const CallbackUV = c.uv_getnameinfo_cb;
     data: ?*anyopaque,
     type: c.uv_req_type,
     reserved: [6]?*anyopaque,
@@ -37,7 +38,7 @@ pub const GetNameInfo = struct {
         const res = c.uv_getnameinfo(
             loop.toUV(),
             self.toUV(),
-            cb,
+            @ptrCast(CallbackUV, cb),
             addr.toConstUV(),
             flags,
         );
@@ -47,12 +48,12 @@ pub const GetNameInfo = struct {
 
 /// A `getnameinfo` callback for the test
 fn gotNameInfo(
-    uv_getaddrinfo: ?*GetNameInfo.UV,
+    maybe_getnameinfo: ?*GetNameInfo,
     status: c_int,
     maybe_hostname: ?*const u8,
     maybe_service: ?*const u8,
 ) callconv(.C) void {
-    _ = uv_getaddrinfo;
+    _ = maybe_getnameinfo;
     // Check the status
     check(status) catch unreachable;
     // Assert we actually got a match
