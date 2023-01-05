@@ -6,6 +6,7 @@ const Cast = lib.Cast;
 const Connect = lib.Connect;
 const HandleDecls = lib.HandleDecls;
 const Loop = lib.Loop;
+const Stream = lib.Stream;
 const StreamDecls = lib.StreamDecls;
 const c = lib.c;
 const check = lib.check;
@@ -43,24 +44,16 @@ pub const TCP = extern struct {
     usingnamespace HandleDecls;
     usingnamespace StreamDecls;
     /// Initialize the handle
-    pub fn init(loop: *Loop) !Self {
-        // Prepare a pointer for the handle
-        var self: Self = undefined;
+    pub fn init(self: *Self, loop: *Loop) !void {
         // Initialize the handle
         const res = c.uv_tcp_init(loop.toUV(), self.toUV());
         try check(res);
-        // Return the handle
-        return self;
     }
     /// Initialize the handle with the specified flags
-    pub fn initEx(loop: *Loop, flags: c_uint) !Self {
-        // Prepare a pointer for the handle
-        var self: Self = undefined;
+    pub fn initEx(self: *Self, loop: *Loop, flags: c_uint) !void {
         // Initialize the handle
         const res = c.uv_tcp_init_ex(loop.toUV(), self.toUV(), flags);
         try check(res);
-        // Return the handle
-        return self;
     }
     /// Open an existing file descriptor or SOCKET as a TCP handle
     pub fn open(self: *Self, sock: misc.OsSock) !void {
@@ -104,13 +97,13 @@ pub const TCP = extern struct {
         self: *Self,
         req: *Connect,
         addr: *const dns.SockAddr,
-        cb: Self.ConnectionCallback,
+        cb: Self.ConnectCallback,
     ) !void {
         const res = c.uv_tcp_connect(
             req.toUV(),
             self.toUV(),
-            addr.toUV(),
-            @ptrCast(Self.ConnectionCallbackUV, cb),
+            addr.toConstUV(),
+            @ptrCast(Self.ConnectCallbackUV, cb),
         );
         try check(res);
     }

@@ -43,9 +43,11 @@ pub const Stream = extern struct {
 
 /// Stream handle declarations
 pub const StreamDecls = struct {
-    pub const ConnectionCallback = ?fn (anytype, c_int) callconv(.C) void;
+    pub const ConnectCallback = ?fn (*Connect, c_int) callconv(.C) void;
+    pub const ConnectCallbackUV = c.uv_connect_cb;
+    pub const ConnectionCallback = ?fn (*Stream, c_int) callconv(.C) void;
     pub const ConnectionCallbackUV = c.uv_connection_cb;
-    pub const ReadCallback = ?fn (anytype, isize, *const misc.Buf) callconv(.C) void;
+    pub const ReadCallback = ?fn (*Stream, isize, *const misc.Buf) callconv(.C) void;
     pub const ReadCallbackUV = c.uv_read_cb;
     /// Start listening for incoming connections
     pub fn listen(stream: anytype, backlog: c_int, cb: ConnectionCallback) !void {
@@ -119,7 +121,7 @@ pub const Connect = extern struct {
     type: c.uv_req_type,
     reserved: [6]?*anyopaque,
     cb: c.uv_connect_cb,
-    handle: [*c]c.uv_stream_t,
+    handle: *Stream,
     queue: [2]?*anyopaque,
     usingnamespace Cast(Self);
 };

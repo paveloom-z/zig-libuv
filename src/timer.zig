@@ -33,14 +33,10 @@ pub const Timer = struct {
     usingnamespace Cast(Self);
     usingnamespace HandleDecls;
     /// Initialize the handle
-    pub fn init(loop: *Loop) !Self {
-        // Prepare a pointer for the handle
-        var self: Self = undefined;
+    pub fn init(self: *Self, loop: *Loop) !void {
         // Initialize the handle
         const res = c.uv_timer_init(loop.toUV(), self.toUV());
         try check(res);
-        // Return the handle
-        return self;
     }
     /// Start the timer
     ///
@@ -92,17 +88,18 @@ test "Timer" {
     try Loop.init(loop);
     defer alloc.destroy(loop);
     // Initialize a timer
-    var timer = try Timer.init(loop);
+    var timer: Timer = undefined;
+    try timer.init(loop);
     // Start the timer
     try timer.start(testCallback, 0, 0);
     // Run the loop
-    try loop.run(Loop.RunMode.DEFAULT);
+    try loop.run(.DEFAULT);
     // Request to stop the timer
     timer.close(null);
     // Check whether the loop is alive
     try std.testing.expect(loop.isAlive());
     // Run the loop again to accomplish that request
-    try loop.run(Loop.RunMode.DEFAULT);
+    try loop.run(.DEFAULT);
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Close the loop

@@ -3,6 +3,7 @@ const std = @import("std");
 const lib = @import("lib.zig");
 
 const Cast = lib.Cast;
+const Handle = lib.Handle;
 const c = lib.c;
 const check = lib.check;
 
@@ -10,6 +11,8 @@ const check = lib.check;
 pub const Loop = extern struct {
     const Self = @This();
     pub const UV = c.uv_loop_t;
+    pub const WalkCallback = ?fn (?*Handle, ?*anyopaque) callconv(.C) void;
+    pub const WalkCallbackUV = c.uv_walk_cb;
     /// Mode used to run the loop with
     pub const RunMode = enum(c_uint) {
         DEFAULT = c.UV_RUN_DEFAULT,
@@ -81,6 +84,14 @@ pub const Loop = extern struct {
     pub fn stop(self: *Self) void {
         c.uv_stop(self.toUV());
     }
+    /// Walk the list of handles
+    pub fn walk(self: *Self, walk_cb: WalkCallback, arg: ?*anyopaque) void {
+        c.uv_walk(
+            self.toUV(),
+            @ptrCast(WalkCallbackUV, walk_cb),
+            arg,
+        );
+    }
     /// Close the loop
     pub fn close(self: *Self) !void {
         const res = c.uv_loop_close(self.toUV());
@@ -97,7 +108,7 @@ test "Loop" {
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Run the loop
-    try loop.run(Loop.RunMode.DEFAULT);
+    try loop.run(.DEFAULT);
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Close the loop
@@ -110,7 +121,7 @@ test "Loop (default)" {
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Run the loop
-    try loop.run(Loop.RunMode.DEFAULT);
+    try loop.run(.DEFAULT);
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Close the loop

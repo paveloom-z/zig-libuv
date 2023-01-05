@@ -32,8 +32,8 @@ pub const GetAddrInfo = extern struct {
         self: *Self,
         loop: *Loop,
         cb: Callback,
-        node: ?*const u8,
-        service: ?*const u8,
+        node: ?[*:0]const u8,
+        service: ?[*:0]const u8,
         hints: ?*dns.AddrInfo,
     ) !void {
         const res = c.uv_getaddrinfo(
@@ -79,16 +79,16 @@ test "`getaddrinfo`" {
     defer alloc.destroy(loop);
     // Prepare hints
     var hints: dns.AddrInfo = undefined;
-    hints.ai_family = c.AF_INET;
-    hints.ai_socktype = c.SOCK_STREAM;
-    hints.ai_protocol = c.IPPROTO_TCP;
+    hints.ai_family = .AF_INET;
+    hints.ai_socktype = .SOCK_STREAM;
+    hints.ai_protocol = .IPPROTO_TCP;
     hints.ai_flags = 0;
     // Prepare a request
     var req: GetAddrInfo = undefined;
-    const hostname = @ptrCast(*const u8, "localhost");
+    const hostname = "localhost";
     try req.getaddrinfo(loop, gotAddrInfo, hostname, null, &hints);
     // Run the loop
-    try loop.run(Loop.RunMode.DEFAULT);
+    try loop.run(.DEFAULT);
     // Close the loop
     try loop.close();
 }

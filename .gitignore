@@ -5,3 +5,7 @@ zig-out
 # Zigmod
 .zigmod
 deps.zig
+
+# Valgrind
+leak.txt
+vgcore*

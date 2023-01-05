@@ -86,7 +86,7 @@ test "`getnameinfo`" {
     var req: GetNameInfo = undefined;
     try req.getnameinfo(loop, gotNameInfo, sockaddr_in.asAddr(), 0);
     // Run the loop
-    try loop.run(Loop.RunMode.DEFAULT);
+    try loop.run(.DEFAULT);
     // Close the loop
     try loop.close();
 }
