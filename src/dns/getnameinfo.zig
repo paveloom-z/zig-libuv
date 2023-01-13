@@ -1,13 +1,14 @@
 const std = @import("std");
 
-const lib = @import("../lib.zig");
+const uv = @import("../lib.zig");
 
-const Cast = lib.Cast;
-const Loop = lib.Loop;
-const c = lib.c;
-const check = lib.check;
-const dns = lib.dns;
-const misc = lib.misc;
+const Cast = uv.Cast;
+const Loop = uv.Loop;
+const SockAddr = uv.SockAddr;
+const SockAddrIn = uv.SockAddrIn;
+const c = uv.c;
+const check = uv.check;
+const ip4Addr = uv.ip4Addr;
 
 /// `getnameinfo` request type
 pub const GetNameInfo = struct {
@@ -32,7 +33,7 @@ pub const GetNameInfo = struct {
         self: *Self,
         loop: *Loop,
         cb: Callback,
-        addr: *const dns.SockAddr,
+        addr: *const SockAddr,
         flags: c_int,
     ) !void {
         const res = c.uv_getnameinfo(
@@ -80,13 +81,13 @@ test "`getnameinfo`" {
     try Loop.init(loop);
     defer alloc.destroy(loop);
     // Prepare an address
-    var sockaddr_in: dns.SockAddrIn = undefined;
-    misc.ip4Addr("127.0.0.1", 80, &sockaddr_in) catch unreachable;
+    var sockaddr_in: SockAddrIn = undefined;
+    ip4Addr("127.0.0.1", 80, &sockaddr_in) catch unreachable;
     // Prepare a request
     var req: GetNameInfo = undefined;
     try req.getnameinfo(loop, gotNameInfo, sockaddr_in.asAddr(), 0);
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Close the loop
     try loop.close();
 }

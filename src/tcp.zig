@@ -1,24 +1,26 @@
 const std = @import("std");
 
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const Cast = lib.Cast;
-const Connect = lib.Connect;
-const HandleDecls = lib.HandleDecls;
-const Loop = lib.Loop;
-const Stream = lib.Stream;
-const StreamDecls = lib.StreamDecls;
-const c = lib.c;
-const check = lib.check;
-const dns = lib.dns;
-const misc = lib.misc;
+const Cast = uv.Cast;
+const Connect = uv.Connect;
+const Handle = uv.Handle;
+const HandleDecls = uv.HandleDecls;
+const Loop = uv.Loop;
+const OsSock = uv.OsSock;
+const Shutdown = uv.Shutdown;
+const SockAddr = uv.SockAddr;
+const Stream = uv.Stream;
+const StreamDecls = uv.StreamDecls;
+const c = uv.c;
+const check = uv.check;
 
 /// TCP handle
 pub const TCP = extern struct {
     const Self = @This();
     pub const UV = c.uv_tcp_t;
     data: ?*anyopaque,
-    loop: [*c]c.uv_loop_t,
+    loop: ?*Loop,
     type: c.uv_handle_type,
     close_cb: c.uv_close_cb,
     handle_queue: [2]?*anyopaque,
@@ -26,17 +28,17 @@ pub const TCP = extern struct {
         fd: c_int,
         reserved: [4]?*anyopaque,
     },
-    next_closing: [*c]c.uv_handle_t,
+    next_closing: ?*Handle,
     flags: c_uint,
     write_queue_size: usize,
-    alloc_cb: c.uv_alloc_cb,
-    read_cb: c.uv_read_cb,
-    connect_req: [*c]c.uv_connect_t,
-    shutdown_req: [*c]c.uv_shutdown_t,
+    alloc_cb: Handle.AllocCallbackUV,
+    read_cb: Stream.ReadCallbackUV,
+    connect_req: ?*Stream.ConnectCallbackUV,
+    shutdown_req: ?*Shutdown.ShutdownCallbackUV,
     io_watcher: c.uv__io_t,
     write_queue: [2]?*anyopaque,
     write_completed_queue: [2]?*anyopaque,
-    connection_cb: c.uv_connection_cb,
+    connection_cb: Stream.ConnectionCallbackUV,
     delayed_error: c_int,
     accepted_fd: c_int,
     queued_fds: ?*anyopaque,
@@ -56,7 +58,7 @@ pub const TCP = extern struct {
         try check(res);
     }
     /// Open an existing file descriptor or SOCKET as a TCP handle
-    pub fn open(self: *Self, sock: misc.OsSock) !void {
+    pub fn open(self: *Self, sock: OsSock) !void {
         const res = c.uv_tcp_open(self.toUV(), sock);
         try check(res);
     }
@@ -78,17 +80,17 @@ pub const TCP = extern struct {
         try check(res);
     }
     /// Bind the handle to an address and port
-    pub fn bind(self: *Self, addr: *const dns.SockAddr, flags: c_uint) !void {
+    pub fn bind(self: *Self, addr: *const SockAddr, flags: c_uint) !void {
         const res = c.uv_tcp_bind(self.toUV(), addr.toUV(), flags);
         try check(res);
     }
     /// Get the current address to which the handle is bound
-    pub fn getSockName(self: *Self, name: *dns.SockAddr, namelen: *c_int) !void {
+    pub fn getSockName(self: *Self, name: *SockAddr, namelen: *c_int) !void {
         const res = c.uv_tcp_getsockname(self.toUV(), name.toUV(), namelen);
         try check(res);
     }
     /// Get the address of the peer connected to the handle
-    pub fn getPeerName(self: *Self, name: *dns.SockAddr, namelen: *c_int) !void {
+    pub fn getPeerName(self: *Self, name: *SockAddr, namelen: *c_int) !void {
         const res = c.uv_tcp_getpeername(self.toUV(), name.toUV(), namelen);
         try check(res);
     }
@@ -96,7 +98,7 @@ pub const TCP = extern struct {
     pub fn connect(
         self: *Self,
         req: *Connect,
-        addr: *const dns.SockAddr,
+        addr: *const SockAddr,
         cb: Self.ConnectCallback,
     ) !void {
         const res = c.uv_tcp_connect(
@@ -119,7 +121,7 @@ pub const TCP = extern struct {
     pub fn socketPair(
         @"type": c_int,
         protocol: c_int,
-        socket_vector: *misc.OsSock,
+        socket_vector: *OsSock,
         flags0: c_int,
         flags1: c_int,
     ) !void {

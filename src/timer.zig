@@ -1,12 +1,12 @@
 const std = @import("std");
 
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const Cast = lib.Cast;
-const HandleDecls = lib.HandleDecls;
-const Loop = lib.Loop;
-const c = lib.c;
-const check = lib.check;
+const Cast = uv.Cast;
+const HandleDecls = uv.HandleDecls;
+const Loop = uv.Loop;
+const c = uv.c;
+const check = uv.check;
 
 /// Timer handle
 pub const Timer = struct {
@@ -93,13 +93,13 @@ test "Timer" {
     // Start the timer
     try timer.start(testCallback, 0, 0);
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Request to stop the timer
     timer.close(null);
     // Check whether the loop is alive
     try std.testing.expect(loop.isAlive());
     // Run the loop again to accomplish that request
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Close the loop

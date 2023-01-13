@@ -1,6 +1,6 @@
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const c = lib.c;
+const c = uv.c;
 
 /// A `libuv` error
 pub const Error = error{

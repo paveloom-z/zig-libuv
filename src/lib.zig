@@ -2,20 +2,15 @@ const std = @import("std");
 
 pub const c = @import("c.zig");
 
-pub const dns = @import("dns.zig");
-pub const misc = @import("misc.zig");
-usingnamespace @import("cast.zig");
-usingnamespace @import("error.zig");
-usingnamespace @import("fs.zig");
-usingnamespace @import("handle.zig");
-usingnamespace @import("loop.zig");
-usingnamespace @import("req.zig");
-usingnamespace @import("signal.zig");
-usingnamespace @import("stream.zig");
-usingnamespace @import("tcp.zig");
-usingnamespace @import("timer.zig");
-
-test {
-    // Reference nested container tests
-    std.testing.refAllDecls(@This());
-}
+pub usingnamespace @import("cast.zig");
+pub usingnamespace @import("dns.zig");
+pub usingnamespace @import("error.zig");
+pub usingnamespace @import("fs.zig");
+pub usingnamespace @import("handle.zig");
+pub usingnamespace @import("loop.zig");
+pub usingnamespace @import("misc.zig");
+pub usingnamespace @import("req.zig");
+pub usingnamespace @import("signal.zig");
+pub usingnamespace @import("stream.zig");
+pub usingnamespace @import("tcp.zig");
+pub usingnamespace @import("timer.zig");

@@ -1,17 +1,19 @@
 const std = @import("std");
 
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const Cast = lib.Cast;
-const Loop = lib.Loop;
-const Req = lib.Req;
-const ReqDecls = lib.ReqDecls;
-const c = lib.c;
-const check = lib.check;
-const misc = lib.misc;
+const Buf = uv.Buf;
+const Cast = uv.Cast;
+const File = uv.File;
+const Loop = uv.Loop;
+const OsFd = uv.OsFd;
+const Req = uv.Req;
+const ReqDecls = uv.ReqDecls;
+const c = uv.c;
+const check = uv.check;
 
 /// Kind of a `copyfile` operation
-usingnamespace struct {
+pub usingnamespace struct {
     pub const FS_COPYFILE_EXCL = c.UV_FS_COPYFILE_EXCL;
     pub const FS_COPYFILE_FICLONE = c.UV_FS_COPYFILE_FICLONE;
     pub const FS_COPYFILE_FICLONE_FORCE = c.UV_FS_COPYFILE_FICLONE_FORCE;
@@ -28,24 +30,24 @@ pub const FS = extern struct {
     reserved: [6]?*anyopaque,
     fs_type: c_int,
     loop: *Loop,
-    cb: c.uv_fs_cb,
+    cb: FSCallbackUV,
     result: isize,
     ptr: ?*anyopaque,
     path: ?[*:0]const u8,
-    statbuf: c.uv_stat_t,
+    statbuf: Stat.UV,
     new_path: ?[*:0]const u8,
-    file: misc.File,
+    file: File,
     flags: c_int,
     mode: c.mode_t,
     nbufs: c_uint,
-    bufs: *misc.Buf,
+    bufs: *Buf,
     off: c.off_t,
     uid: c.uv_uid_t,
     gid: c.uv_gid_t,
     atime: f64,
     mtime: f64,
     work_req: c.struct_uv__work,
-    bufsml: [4]misc.Buf,
+    bufsml: [4]Buf,
     usingnamespace Cast(Self);
     usingnamespace ReqDecls;
     /// Cleanup request
@@ -56,7 +58,7 @@ pub const FS = extern struct {
     pub fn close(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         cb: FSCallback,
     ) !void {
         const res = c.uv_fs_close(
@@ -90,8 +92,8 @@ pub const FS = extern struct {
     pub fn read(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
-        bufs: ?*const misc.Buf,
+        file: File,
+        bufs: ?*const Buf,
         nbufs: c_uint,
         offset: i64,
         cb: FSCallback,
@@ -126,8 +128,8 @@ pub const FS = extern struct {
     pub fn write(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
-        bufs: ?*const misc.Buf,
+        file: File,
+        bufs: ?*const Buf,
         nbufs: c_uint,
         offset: i64,
         cb: FSCallback,
@@ -291,7 +293,7 @@ pub const FS = extern struct {
     pub fn fstat(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         cb: FSCallback,
     ) !void {
         const res = c.uv_fs_fstat(
@@ -353,7 +355,7 @@ pub const FS = extern struct {
     pub fn fsync(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         cb: FSCallback,
     ) !void {
         const res = c.uv_fs_fsync(
@@ -368,7 +370,7 @@ pub const FS = extern struct {
     pub fn fdatasync(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         cb: FSCallback,
     ) !void {
         const res = c.uv_fs_fdatasync(
@@ -383,7 +385,7 @@ pub const FS = extern struct {
     pub fn ftruncate(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         offset: i64,
         cb: FSCallback,
     ) !void {
@@ -410,7 +412,7 @@ pub const FS = extern struct {
             self.toUV(),
             path,
             new_path,
-            @enumToInt(flags),
+            flags,
             @ptrCast(FSCallbackUV, cb),
         );
         try check(res);
@@ -419,8 +421,8 @@ pub const FS = extern struct {
     pub fn sendfile(
         self: *Self,
         loop: *Loop,
-        out_fd: misc.File,
-        in_fd: misc.File,
+        out_fd: File,
+        in_fd: File,
         in_offset: i64,
         length: usize,
         cb: FSCallback,
@@ -474,7 +476,7 @@ pub const FS = extern struct {
     pub fn fchmod(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         mode: c_int,
         cb: FSCallback,
     ) !void {
@@ -510,7 +512,7 @@ pub const FS = extern struct {
     pub fn futime(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         atime: f64,
         mtime: f64,
         cb: FSCallback,
@@ -633,7 +635,7 @@ pub const FS = extern struct {
     pub fn fchown(
         self: *Self,
         loop: *Loop,
-        file: misc.File,
+        file: File,
         uid: c.uv_uid_t,
         gid: c.uv_gid_t,
         cb: FSCallback,
@@ -702,7 +704,7 @@ pub const Stat = extern struct {
 };
 
 /// File system request type
-usingnamespace struct {
+pub usingnamespace struct {
     pub const FS_ACCESS = c.UV_FS_ACCESS;
     pub const FS_CHMOD = c.UV_FS_CHMOD;
     pub const FS_CHOWN = c.UV_FS_CHOWN;
@@ -760,22 +762,24 @@ pub const StatFS = extern struct {
 
 /// Cross platform (reduced) equivalent of `struct dirent`
 pub const DirEnt = extern struct {
-    /// Type of a `DirEnt`
-    const Type = enum(c_int) {
-        UV_DIRENT_BLOCK = c.UV_DIRENT_BLOCK,
-        UV_DIRENT_CHAR = c.UV_DIRENT_CHAR,
-        UV_DIRENT_DIR = c.UV_DIRENT_DIR,
-        UV_DIRENT_FIFO = c.UV_DIRENT_FIFO,
-        UV_DIRENT_FILE = c.UV_DIRENT_FILE,
-        UV_DIRENT_LINK = c.UV_DIRENT_LINK,
-        UV_DIRENT_SOCKET = c.UV_DIRENT_SOCKET,
-        UV_DIRENT_UNKNOWN = c.UV_DIRENT_UNKNOWN,
-    };
+    const Type = c.uv_dirent_type_t;
     const Self = @This();
     pub const UV = c.uv_dirent_t;
     name: ?[*:0]const u8,
     type: Type,
     usingnamespace Cast(Self);
+};
+
+/// Type of a `DirEnt`
+pub usingnamespace struct {
+    pub const DIRENT_BLOCK = c.UV_DIRENT_BLOCK;
+    pub const DIRENT_CHAR = c.UV_DIRENT_CHAR;
+    pub const DIRENT_DIR = c.UV_DIRENT_DIR;
+    pub const DIRENT_FIFO = c.UV_DIRENT_FIFO;
+    pub const DIRENT_FILE = c.UV_DIRENT_FILE;
+    pub const DIRENT_LINK = c.UV_DIRENT_LINK;
+    pub const DIRENT_SOCKET = c.UV_DIRENT_SOCKET;
+    pub const DIRENT_UNKNOWN = c.UV_DIRENT_UNKNOWN;
 };
 
 /// Data type used for streaming directory iteration
@@ -790,18 +794,18 @@ pub const Dir = extern struct {
 };
 
 /// For a file descriptor in the C runtime, get the OS-dependent handle
-pub fn getOSFHandle(fd: c_int) misc.OsFd {
+pub fn getOSFHandle(fd: c_int) OsFd {
     return c.uv_get_osfhandle(fd);
 }
 
 /// For a OS-dependent handle, get the file descriptor in the C runtime
-pub fn openOSFHandle(os_fd: misc.OsFd) !void {
+pub fn openOSFHandle(os_fd: OsFd) !void {
     const res = c.uv_open_osfhandle(os_fd);
     try check(res);
 }
 
 /// File open flags
-usingnamespace struct {
+pub usingnamespace struct {
     pub const FS_O_APPEND = c.UV_FS_O_APPEND;
     pub const FS_O_CREAT = c.UV_FS_O_CREAT;
     pub const FS_O_DIRECT = c.UV_FS_O_DIRECT;

@@ -1,19 +1,19 @@
 const std = @import("std");
 
-const lib = @import("../lib.zig");
+const uv = @import("../lib.zig");
 
-const Cast = lib.Cast;
-const Loop = lib.Loop;
-const c = lib.c;
-const check = lib.check;
-const dns = lib.dns;
-const misc = lib.misc;
+const AddrInfo = uv.AddrInfo;
+const Cast = uv.Cast;
+const Loop = uv.Loop;
+const c = uv.c;
+const check = uv.check;
+const ip4Name = uv.ip4Name;
 
 /// `getaddrinfo` request type
 pub const GetAddrInfo = extern struct {
     const Self = @This();
     pub const UV = c.uv_getaddrinfo_t;
-    pub const Callback = ?fn (?*GetAddrInfo, c_int, ?*dns.AddrInfo) callconv(.C) void;
+    pub const Callback = ?fn (?*GetAddrInfo, c_int, ?*AddrInfo) callconv(.C) void;
     pub const CallbackUV = c.uv_getaddrinfo_cb;
     data: ?*anyopaque,
     type: c.uv_req_type,
@@ -34,7 +34,7 @@ pub const GetAddrInfo = extern struct {
         cb: Callback,
         node: ?[*:0]const u8,
         service: ?[*:0]const u8,
-        hints: ?*dns.AddrInfo,
+        hints: ?*uv.AddrInfo,
     ) !void {
         const res = c.uv_getaddrinfo(
             loop.toUV(),
@@ -42,7 +42,7 @@ pub const GetAddrInfo = extern struct {
             @ptrCast(CallbackUV, cb),
             node,
             service,
-            dns.AddrInfo.toUV(hints),
+            uv.AddrInfo.toUV(hints),
         );
         try check(res);
     }
@@ -52,7 +52,7 @@ pub const GetAddrInfo = extern struct {
 fn gotAddrInfo(
     maybe_getaddrinfo: ?*GetAddrInfo,
     status: c_int,
-    maybe_res: ?*dns.AddrInfo,
+    maybe_res: ?*uv.AddrInfo,
 ) callconv(.C) void {
     _ = maybe_getaddrinfo;
     // Check the status
@@ -62,7 +62,7 @@ fn gotAddrInfo(
     defer res.free();
     // Get the IP4 address
     var buffer = [_]u8{0} ** 11;
-    misc.ip4Name(res.ai_addr.asIn(), buffer[0..10]) catch unreachable;
+    ip4Name(res.ai_addr.asIn(), buffer[0..10]) catch unreachable;
     // Check whether the address is correct
     std.debug.assert(std.mem.eql(
         u8,
@@ -78,17 +78,17 @@ test "`getaddrinfo`" {
     try Loop.init(loop);
     defer alloc.destroy(loop);
     // Prepare hints
-    var hints: dns.AddrInfo = undefined;
-    hints.ai_family = .AF_INET;
-    hints.ai_socktype = .SOCK_STREAM;
-    hints.ai_protocol = .IPPROTO_TCP;
+    var hints: uv.AddrInfo = undefined;
+    hints.ai_family = uv.AF_INET;
+    hints.ai_socktype = uv.SOCK_STREAM;
+    hints.ai_protocol = uv.IPPROTO_TCP;
     hints.ai_flags = 0;
     // Prepare a request
     var req: GetAddrInfo = undefined;
     const hostname = "localhost";
     try req.getaddrinfo(loop, gotAddrInfo, hostname, null, &hints);
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Close the loop
     try loop.close();
 }

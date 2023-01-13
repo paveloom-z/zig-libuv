@@ -1,9 +1,9 @@
 const std = @import("std");
 
-const libuv = @import("libuv");
+const uv = @import("libuv");
 
 /// A callback for the timer
-fn timerCallback(maybe_handle: ?*libuv.Timer) callconv(.C) void {
+fn timerCallback(maybe_handle: ?*uv.Timer) callconv(.C) void {
     // Assert we actually got a handle
     const handle = maybe_handle.?;
     // Assert this handle has the data
@@ -23,11 +23,11 @@ fn timerCallback(maybe_handle: ?*libuv.Timer) callconv(.C) void {
 pub fn main() !void {
     const alloc = std.heap.c_allocator;
     // Initialize the loop
-    var loop = try alloc.create(libuv.Loop);
-    try libuv.Loop.init(loop);
+    var loop = try alloc.create(uv.Loop);
+    try uv.Loop.init(loop);
     defer alloc.destroy(loop);
     // Initialize a timer
-    var timer: libuv.Timer = undefined;
+    var timer: uv.Timer = undefined;
     try timer.init(loop);
     // We use the double `baton` approach here to store user
     // data just for these sweet methods in the callback
@@ -36,7 +36,7 @@ pub fn main() !void {
     // Count to 10, then say goodbye
     try timer.start(timerCallback, 0, 250);
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Close the loop
     try loop.close();
 }

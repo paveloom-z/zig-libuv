@@ -1,24 +1,19 @@
 const std = @import("std");
 
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const Cast = lib.Cast;
-const Handle = lib.Handle;
-const c = lib.c;
-const check = lib.check;
+const Cast = uv.Cast;
+const Handle = uv.Handle;
+const c = uv.c;
+const check = uv.check;
 
 /// An event loop
 pub const Loop = extern struct {
+    pub const RunMode = c.uv_run_mode;
     const Self = @This();
     pub const UV = c.uv_loop_t;
     pub const WalkCallback = ?fn (?*Handle, ?*anyopaque) callconv(.C) void;
     pub const WalkCallbackUV = c.uv_walk_cb;
-    /// Mode used to run the loop with
-    pub const RunMode = enum(c_uint) {
-        DEFAULT = c.UV_RUN_DEFAULT,
-        ONCE = c.UV_RUN_ONCE,
-        NOWAIT = c.UV_RUN_NOWAIT,
-    };
     data: ?*anyopaque,
     active_handles: c_uint,
     handle_queue: [2]?*anyopaque,
@@ -73,7 +68,7 @@ pub const Loop = extern struct {
     }
     /// Run the loop
     pub fn run(self: *Self, run_mode: RunMode) !void {
-        const res = c.uv_run(self.toUV(), @enumToInt(run_mode));
+        const res = c.uv_run(self.toUV(), run_mode);
         try check(res);
     }
     /// Check if the loop is alive
@@ -99,6 +94,13 @@ pub const Loop = extern struct {
     }
 };
 
+/// Mode used to run the loop with
+pub usingnamespace struct {
+    pub const RUN_DEFAULT = c.UV_RUN_DEFAULT;
+    pub const RUN_NOWAIT = c.UV_RUN_NOWAIT;
+    pub const RUN_ONCE = c.UV_RUN_ONCE;
+};
+
 test "Loop" {
     const alloc = std.testing.allocator;
     // Initialize the loop
@@ -108,7 +110,7 @@ test "Loop" {
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Close the loop
@@ -121,7 +123,7 @@ test "Loop (default)" {
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Check whether the loop is alive
     try std.testing.expect(!loop.isAlive());
     // Close the loop

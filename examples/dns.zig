@@ -1,12 +1,16 @@
 const std = @import("std");
 
-const libuv = @import("libuv");
+const uv = @import("libuv");
 
 const alloc = std.heap.c_allocator;
-var loop: *libuv.Loop = undefined;
+var loop: *uv.Loop = undefined;
 
 /// Allocate the buffer
-fn allocBuffer(maybe_handle: ?*libuv.Handle, suggested_size: usize, maybe_buf: ?*libuv.misc.Buf) callconv(.C) void {
+fn allocBuffer(
+    maybe_handle: ?*uv.Handle,
+    suggested_size: usize,
+    maybe_buf: ?*uv.Buf,
+) callconv(.C) void {
     _ = maybe_handle;
     // If the buffer is still there
     if (maybe_buf) |buf| {
@@ -24,7 +28,11 @@ fn allocBuffer(maybe_handle: ?*libuv.Handle, suggested_size: usize, maybe_buf: ?
 }
 
 /// A callback in case there is something to read from the stream
-fn onRead(client: *libuv.Stream, nread_isize: isize, buf: *const libuv.misc.Buf) callconv(.C) void {
+fn onRead(
+    client: *uv.Stream,
+    nread_isize: isize,
+    buf: *const uv.Buf,
+) callconv(.C) void {
     // Free the memory when done
     defer alloc.destroy(buf.base);
     // Prepare a writer
@@ -33,8 +41,8 @@ fn onRead(client: *libuv.Stream, nread_isize: isize, buf: *const libuv.misc.Buf)
     if (nread_isize < 0) {
         const nread_c_int = @intCast(c_int, nread_isize);
         // If that's abnormal
-        libuv.check(nread_c_int) catch |err| {
-            if (err != libuv.Error.UV_EOF) {
+        uv.check(nread_c_int) catch |err| {
+            if (err != uv.Error.UV_EOF) {
                 stderr.print("Couldn't read from the stream, got {}.\n", .{err}) catch {};
             }
         };
@@ -62,13 +70,13 @@ fn onRead(client: *libuv.Stream, nread_isize: isize, buf: *const libuv.misc.Buf)
 }
 
 /// A callback in case the TCP connection is established
-fn onConnect(req: *libuv.Connect, status: c_int) callconv(.C) void {
+fn onConnect(req: *uv.Connect, status: c_int) callconv(.C) void {
     // Free the memory when done
     defer alloc.destroy(req);
     // Prepare a writer
     const stderr = std.io.getStdErr().writer();
     // Check the status code
-    libuv.check(status) catch |err| {
+    uv.check(status) catch |err| {
         stderr.print("Couldn't connect, got {}.\n", .{err}) catch {};
         return;
     };
@@ -81,15 +89,15 @@ fn onConnect(req: *libuv.Connect, status: c_int) callconv(.C) void {
 
 /// A callback in case the address is resolved
 fn onResolved(
-    maybe_getaddrinfo: ?*libuv.dns.GetAddrInfo,
+    maybe_getaddrinfo: ?*uv.GetAddrInfo,
     status: c_int,
-    maybe_res: ?*libuv.dns.AddrInfo,
+    maybe_res: ?*uv.AddrInfo,
 ) callconv(.C) void {
     _ = maybe_getaddrinfo;
     // Prepare a writer
     const stderr = std.io.getStdErr().writer();
     // Check the status code
-    libuv.check(status) catch |err| {
+    uv.check(status) catch |err| {
         stderr.print("Couldn't resolve, got {}.\n", .{err}) catch {};
         return;
     };
@@ -97,20 +105,20 @@ fn onResolved(
     defer res.free();
     // Get the IP4 address
     var addr = [_]u8{0} ** 17;
-    libuv.misc.ip4Name(res.ai_addr.asIn(), addr[0..16]) catch |err| {
+    uv.ip4Name(res.ai_addr.asIn(), addr[0..16]) catch |err| {
         stderr.print("Couldn't decode the address, got {}.\n", .{err}) catch {};
         return;
     };
     stderr.print("{s}\n", .{&addr}) catch {};
     // Make a TCP connection
-    var connect_req = alloc.create(libuv.Connect) catch |err| {
+    var connect_req = alloc.create(uv.Connect) catch |err| {
         stderr.print(
             "Couldn't allocate memory for the connect request, got {}.\n",
             .{err},
         ) catch {};
         return;
     };
-    var socket = alloc.create(libuv.TCP) catch |err| {
+    var socket = alloc.create(uv.TCP) catch |err| {
         stderr.print(
             "Couldn't allocate memory for the socket, got {}.\n",
             .{err},
@@ -128,7 +136,7 @@ fn onResolved(
 }
 
 /// A callback to call when closing the handle
-fn onClose(maybe_handle: ?*libuv.Handle) callconv(.C) void {
+fn onClose(maybe_handle: ?*uv.Handle) callconv(.C) void {
     // If the handle is still there
     if (maybe_handle) |handle| {
         // Free the memory
@@ -137,7 +145,7 @@ fn onClose(maybe_handle: ?*libuv.Handle) callconv(.C) void {
 }
 
 /// A callback to call for each handle
-fn onWalk(maybe_handle: ?*libuv.Handle, arg: ?*anyopaque) callconv(.C) void {
+fn onWalk(maybe_handle: ?*uv.Handle, arg: ?*anyopaque) callconv(.C) void {
     _ = arg;
     // If the handle is still there
     if (maybe_handle) |handle| {
@@ -150,14 +158,14 @@ fn onWalk(maybe_handle: ?*libuv.Handle, arg: ?*anyopaque) callconv(.C) void {
 }
 
 /// A callback in case an interrupt happened
-fn onInterrupt(handle: *libuv.Signal, signum: c_int) callconv(.C) void {
+fn onInterrupt(handle: *uv.Signal, signum: c_int) callconv(.C) void {
     _ = signum;
     // Print the message
     const stderr = std.io.getStdErr().writer();
     stderr.print("\rInterrupting...\n", .{}) catch {};
     // Try to close the loop
     loop.close() catch |err| {
-        if (err == libuv.Error.UV_EBUSY) {
+        if (err == uv.Error.UV_EBUSY) {
             // Request to close each handle
             handle.loop.walk(onWalk, null);
         }
@@ -167,24 +175,24 @@ fn onInterrupt(handle: *libuv.Signal, signum: c_int) callconv(.C) void {
 /// Run the program
 pub fn main() !void {
     // Initialize the loop
-    loop = try alloc.create(libuv.Loop);
+    loop = try alloc.create(uv.Loop);
     defer alloc.destroy(loop);
-    try libuv.Loop.init(loop);
+    try uv.Loop.init(loop);
     // Prepare a handler for the interrupt signal
-    var sigint = try alloc.create(libuv.Signal);
+    var sigint = try alloc.create(uv.Signal);
     try sigint.init(loop);
     try sigint.start(onInterrupt, std.os.SIG.INT);
     // Prepare hints for the resolver
-    var hints: libuv.dns.AddrInfo = undefined;
-    hints.ai_family = .AF_INET;
-    hints.ai_socktype = .SOCK_STREAM;
-    hints.ai_protocol = .IPPROTO_TCP;
+    var hints: uv.AddrInfo = undefined;
+    hints.ai_family = uv.AF_INET;
+    hints.ai_socktype = uv.SOCK_STREAM;
+    hints.ai_protocol = uv.IPPROTO_TCP;
     hints.ai_flags = 0;
     // Resolve an address
-    var resolver: libuv.dns.GetAddrInfo = undefined;
+    var resolver: uv.GetAddrInfo = undefined;
     try resolver.getaddrinfo(loop, onResolved, "irc.libera.chat", "6667", &hints);
     // Run the loop
-    try loop.run(.DEFAULT);
+    try loop.run(uv.RUN_DEFAULT);
     // Close the loop
     try loop.close();
 }

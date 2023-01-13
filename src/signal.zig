@@ -1,13 +1,13 @@
 const std = @import("std");
 
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const Cast = lib.Cast;
-const Handle = lib.Handle;
-const HandleDecls = lib.HandleDecls;
-const Loop = lib.Loop;
-const c = lib.c;
-const check = lib.check;
+const Cast = uv.Cast;
+const Handle = uv.Handle;
+const HandleDecls = uv.HandleDecls;
+const Loop = uv.Loop;
+const c = uv.c;
+const check = uv.check;
 
 /// Signal handle
 pub const Signal = extern struct {

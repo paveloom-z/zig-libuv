@@ -1,13 +1,13 @@
 const std = @import("std");
 
-const lib = @import("lib.zig");
+const uv = @import("lib.zig");
 
-const Cast = lib.Cast;
-const Handle = lib.Handle;
-const HandleDecls = lib.HandleDecls;
-const c = lib.c;
-const check = lib.check;
-const misc = lib.misc;
+const Buf = uv.Buf;
+const Cast = uv.Cast;
+const Handle = uv.Handle;
+const HandleDecls = uv.HandleDecls;
+const c = uv.c;
+const check = uv.check;
 
 /// Stream handle
 pub const Stream = extern struct {
@@ -47,7 +47,7 @@ pub const StreamDecls = struct {
     pub const ConnectCallbackUV = c.uv_connect_cb;
     pub const ConnectionCallback = ?fn (*Stream, c_int) callconv(.C) void;
     pub const ConnectionCallbackUV = c.uv_connection_cb;
-    pub const ReadCallback = ?fn (*Stream, isize, *const misc.Buf) callconv(.C) void;
+    pub const ReadCallback = ?fn (*Stream, isize, *const Buf) callconv(.C) void;
     pub const ReadCallbackUV = c.uv_read_cb;
     /// Start listening for incoming connections
     pub fn listen(stream: anytype, backlog: c_int, cb: ConnectionCallback) !void {
@@ -83,7 +83,7 @@ pub const StreamDecls = struct {
     }
     /// Same as `Write.write`, but won’t queue a write
     /// request if it can’t be completed immediately
-    pub fn tryWrite(handle: anytype, bufs: *const misc.Buf, nbufs: c_uint) !c_int {
+    pub fn tryWrite(handle: anytype, bufs: *const Buf, nbufs: c_uint) !c_int {
         const res = c.uv_try_write(handle.toUV(), bufs, nbufs);
         return try check(res);
     }
@@ -91,7 +91,7 @@ pub const StreamDecls = struct {
     /// for sending handles over a pipe like `Write.write2`
     pub fn tryWrite2(
         handle: anytype,
-        bufs: *const misc.Buf,
+        bufs: *const Buf,
         nbufs: c_uint,
         send_handle: *Handle,
     ) !c_int {
@@ -168,7 +168,7 @@ pub const Write = extern struct {
     pub fn write(
         req: *Self,
         handle: *Handle,
-        bufs: *const misc.Buf,
+        bufs: *const Buf,
         nbufs: c_uint,
         cb: WriteCallback,
     ) !void {
@@ -185,7 +185,7 @@ pub const Write = extern struct {
     pub fn write2(
         req: *Self,
         handle: *Handle,
-        bufs: *const misc.Buf,
+        bufs: *const Buf,
         nbufs: c_uint,
         send_handle: *Handle,
         cb: WriteCallback,
