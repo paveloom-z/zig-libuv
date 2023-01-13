@@ -9,7 +9,7 @@ const utils = lib.utils;
 
 /// Base handle
 pub const Handle = extern struct {
-    /// The kind of the libuv handle
+    /// Type of a base handle
     const Type = enum(c_int) {
         UV_ASYNC = c.UV_ASYNC,
         UV_CHECK = c.UV_CHECK,

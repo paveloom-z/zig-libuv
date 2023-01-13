@@ -16,8 +16,14 @@ pub const Buf = extern struct {
     usingnamespace Cast(Self);
 };
 
+/// Cross platform representation of a file handle
+pub const File = c.uv_file;
+
 /// Cross platform representation of a socket handle
 pub const OsSock = c.uv_os_sock_t;
+
+/// Abstract representation of a file descriptor
+pub const OsFd = c.uv_os_fd_t;
 
 /// Convert a binary structure containing an IPv4 address to a string
 pub fn ip4Name(src: *const dns.SockAddrIn, slice: []u8) !void {
