@@ -14,6 +14,14 @@ pub const Buf = extern struct {
     base: [*c]u8,
     len: usize,
     usingnamespace Cast(Self);
+    /// Construct a buffer
+    pub fn init(base: [*c]u8, len: c_uint) Self {
+        const buf = c.uv_buf_init(base, len);
+        return Buf{
+            .base = buf.base,
+            .len = buf.len,
+        };
+    }
 };
 
 /// Cross platform representation of a file handle

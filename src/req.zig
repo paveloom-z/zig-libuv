@@ -34,16 +34,16 @@ pub const ReqDecls = struct {
 
 /// Types of a base request
 pub usingnamespace struct {
-    pub const UV_CONNECT = c.UV_CONNECT;
-    pub const UV_FS = c.UV_FS;
-    pub const UV_GETADDRINFO = c.UV_GETADDRINFO;
-    pub const UV_GETNAMEINFO = c.UV_GETNAMEINFO;
-    pub const UV_RANDOM = c.UV_RANDOM;
-    pub const UV_REQ = c.UV_REQ;
-    pub const UV_REQ_TYPE_MAX = c.UV_REQ_TYPE_MAX;
-    pub const UV_SHUTDOWN = c.UV_SHUTDOWN;
-    pub const UV_UDP_SEND = c.UV_UDP_SEND;
-    pub const UV_UNKNOWN_REQ = c.UV_UNKNOWN_REQ;
-    pub const UV_WORK = c.UV_WORK;
-    pub const UV_WRITE = c.UV_WRITE;
+    pub const CONNECT = c.UV_CONNECT;
+    pub const FS = c.UV_FS;
+    pub const GETADDRINFO = c.UV_GETADDRINFO;
+    pub const GETNAMEINFO = c.UV_GETNAMEINFO;
+    pub const RANDOM = c.UV_RANDOM;
+    pub const REQ = c.UV_REQ;
+    pub const REQ_TYPE_MAX = c.UV_REQ_TYPE_MAX;
+    pub const SHUTDOWN = c.UV_SHUTDOWN;
+    pub const UDP_SEND = c.UV_UDP_SEND;
+    pub const UNKNOWN_REQ = c.UV_UNKNOWN_REQ;
+    pub const WORK = c.UV_WORK;
+    pub const WRITE = c.UV_WRITE;
 };

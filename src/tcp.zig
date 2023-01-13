@@ -16,7 +16,7 @@ const c = uv.c;
 const check = uv.check;
 
 /// TCP handle
-pub const TCP = extern struct {
+pub const Tcp = extern struct {
     const Self = @This();
     pub const UV = c.uv_tcp_t;
     data: ?*anyopaque,

@@ -20,7 +20,7 @@ pub usingnamespace struct {
 };
 
 /// File system request
-pub const FS = extern struct {
+pub const Fs = extern struct {
     const Self = @This();
     pub const UV = c.uv_fs_t;
     pub const FSCallback = ?fn (*Self) callconv(.C) void;
@@ -93,7 +93,7 @@ pub const FS = extern struct {
         self: *Self,
         loop: *Loop,
         file: File,
-        bufs: ?*const Buf,
+        bufs: *const Buf,
         nbufs: c_uint,
         offset: i64,
         cb: FSCallback,
@@ -102,7 +102,7 @@ pub const FS = extern struct {
             loop.toUV(),
             self.toUV(),
             file,
-            bufs,
+            bufs.toConstUV(),
             nbufs,
             offset,
             @ptrCast(FSCallbackUV, cb),
@@ -129,7 +129,7 @@ pub const FS = extern struct {
         self: *Self,
         loop: *Loop,
         file: File,
-        bufs: ?*const Buf,
+        bufs: *const Buf,
         nbufs: c_uint,
         offset: i64,
         cb: FSCallback,
@@ -138,7 +138,7 @@ pub const FS = extern struct {
             loop.toUV(),
             self.toUV(),
             file,
-            bufs,
+            bufs.toConstUV(),
             nbufs,
             offset,
             @ptrCast(FSCallbackUV, cb),
@@ -804,7 +804,52 @@ pub fn openOSFHandle(os_fd: OsFd) !void {
     try check(res);
 }
 
-/// File open flags
+/// Open modes
+pub usingnamespace struct {
+    pub const S_IEXEC = c.S_IEXEC;
+    pub const S_IREAD = c.S_IREAD;
+    pub const S_IRGRP = c.S_IRGRP;
+    pub const S_IROTH = c.S_IROTH;
+    pub const S_IRUSR = c.S_IRUSR;
+    pub const S_IRWXG = c.S_IRWXG;
+    pub const S_IRWXO = c.S_IRWXO;
+    pub const S_IRWXU = c.S_IRWXU;
+    pub const S_ISGID = c.S_ISGID;
+    pub const S_ISUID = c.S_ISUID;
+    pub const S_ISVTX = c.S_ISVTX;
+    pub const S_IWGRP = c.S_IWGRP;
+    pub const S_IWOTH = c.S_IWOTH;
+    pub const S_IWRITE = c.S_IWRITE;
+    pub const S_IWUSR = c.S_IWUSR;
+    pub const S_IXGRP = c.S_IXGRP;
+    pub const S_IXOTH = c.S_IXOTH;
+    pub const S_IXUSR = c.S_IXUSR;
+};
+
+/// `open`'s flags
+pub usingnamespace struct {
+    pub const O_ACCMODE = c.O_ACCMODE;
+    pub const O_APPEND = c.O_APPEND;
+    pub const O_ASYNC = c.O_ASYNC;
+    pub const O_CLOEXEC = c.O_CLOEXEC;
+    pub const O_CREAT = c.O_CREAT;
+    pub const O_DIRECTORY = c.O_DIRECTORY;
+    pub const O_DSYNC = c.O_DSYNC;
+    pub const O_EXCL = c.O_EXCL;
+    pub const O_FSYNC = c.O_FSYNC;
+    pub const O_NDELAY = c.O_NDELAY;
+    pub const O_NOCTTY = c.O_NOCTTY;
+    pub const O_NOFOLLOW = c.O_NOFOLLOW;
+    pub const O_NONBLOCK = c.O_NONBLOCK;
+    pub const O_RDONLY = c.O_RDONLY;
+    pub const O_RDWR = c.O_RDWR;
+    pub const O_RSYNC = c.O_RSYNC;
+    pub const O_SYNC = c.O_SYNC;
+    pub const O_TRUNC = c.O_TRUNC;
+    pub const O_WRONLY = c.O_WRONLY;
+};
+
+/// `libuv's open flags
 pub usingnamespace struct {
     pub const FS_O_APPEND = c.UV_FS_O_APPEND;
     pub const FS_O_CREAT = c.UV_FS_O_CREAT;

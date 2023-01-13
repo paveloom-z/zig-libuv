@@ -24,10 +24,15 @@ pub fn build(b: *std.build.Builder) !void {
         .dependencies = &.{},
     };
     // Add examples
-    const timer = b.addExecutable("timer", "examples/timer.zig");
     const dns = b.addExecutable("dns", "examples/dns.zig");
+    const timer = b.addExecutable("timer", "examples/timer.zig");
+    const uvcat = b.addExecutable("uvcat", "examples/uvcat.zig");
     // For each example
-    inline for (.{ timer, dns }) |step| {
+    inline for (.{
+        dns,
+        timer,
+        uvcat,
+    }) |step| {
         step.setTarget(target);
         step.setBuildMode(mode);
         step.install();
@@ -50,7 +55,13 @@ pub fn build(b: *std.build.Builder) !void {
         }
     }
     // Add the dependencies
-    inline for (.{ lib, unit_tests, timer, dns }) |step| {
+    inline for (.{
+        dns,
+        lib,
+        timer,
+        unit_tests,
+        uvcat,
+    }) |step| {
         inline for (@typeInfo(deps.package_data).Struct.decls) |decl| {
             const pkg = @field(deps.package_data, decl.name);
             // Add the include paths

@@ -5,6 +5,8 @@ const uv = @import("libuv");
 const alloc = std.heap.c_allocator;
 var loop: *uv.Loop = undefined;
 
+const stderr = std.io.getStdErr().writer();
+
 /// Allocate the buffer
 fn allocBuffer(
     maybe_handle: ?*uv.Handle,
@@ -35,8 +37,6 @@ fn onRead(
 ) callconv(.C) void {
     // Free the memory when done
     defer alloc.destroy(buf.base);
-    // Prepare a writer
-    const stderr = std.io.getStdErr().writer();
     // If there are no more bytes to read
     if (nread_isize < 0) {
         const nread_c_int = @intCast(c_int, nread_isize);
@@ -74,7 +74,6 @@ fn onConnect(req: *uv.Connect, status: c_int) callconv(.C) void {
     // Free the memory when done
     defer alloc.destroy(req);
     // Prepare a writer
-    const stderr = std.io.getStdErr().writer();
     // Check the status code
     uv.check(status) catch |err| {
         stderr.print("Couldn't connect, got {}.\n", .{err}) catch {};
@@ -94,8 +93,6 @@ fn onResolved(
     maybe_res: ?*uv.AddrInfo,
 ) callconv(.C) void {
     _ = maybe_getaddrinfo;
-    // Prepare a writer
-    const stderr = std.io.getStdErr().writer();
     // Check the status code
     uv.check(status) catch |err| {
         stderr.print("Couldn't resolve, got {}.\n", .{err}) catch {};
@@ -118,7 +115,7 @@ fn onResolved(
         ) catch {};
         return;
     };
-    var socket = alloc.create(uv.TCP) catch |err| {
+    var socket = alloc.create(uv.Tcp) catch |err| {
         stderr.print(
             "Couldn't allocate memory for the socket, got {}.\n",
             .{err},
@@ -161,7 +158,6 @@ fn onWalk(maybe_handle: ?*uv.Handle, arg: ?*anyopaque) callconv(.C) void {
 fn onInterrupt(handle: *uv.Signal, signum: c_int) callconv(.C) void {
     _ = signum;
     // Print the message
-    const stderr = std.io.getStdErr().writer();
     stderr.print("\rInterrupting...\n", .{}) catch {};
     // Try to close the loop
     loop.close() catch |err| {

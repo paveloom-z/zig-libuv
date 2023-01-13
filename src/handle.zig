@@ -69,23 +69,23 @@ pub const HandleDecls = struct {
 
 /// Types of a base handle
 pub usingnamespace struct {
-    pub const UV_ASYNC = c.UV_ASYNC;
-    pub const UV_CHECK = c.UV_CHECK;
-    pub const UV_FILE = c.UV_FILE;
-    pub const UV_FS_EVENT = c.UV_FS_EVENT;
-    pub const UV_FS_POLL = c.UV_FS_POLL;
-    pub const UV_HANDLE = c.UV_HANDLE;
-    pub const UV_HANDLE_TYPE_MAX = c.UV_HANDLE_TYPE_MAX;
-    pub const UV_IDLE = c.UV_IDLE;
-    pub const UV_NAMED_PIPE = c.UV_NAMED_PIPE;
-    pub const UV_POLL = c.UV_POLL;
-    pub const UV_PREPARE = c.UV_PREPARE;
-    pub const UV_PROCESS = c.UV_PROCESS;
-    pub const UV_SIGNAL = c.UV_SIGNAL;
-    pub const UV_STREAM = c.UV_STREAM;
-    pub const UV_TCP = c.UV_TCP;
-    pub const UV_TIMER = c.UV_TIMER;
-    pub const UV_TTY = c.UV_TTY;
-    pub const UV_UDP = c.UV_UDP;
-    pub const UV_UNKNOWN_HANDLE = c.UV_UNKNOWN_HANDLE;
+    pub const ASYNC = c.UV_ASYNC;
+    pub const CHECK = c.UV_CHECK;
+    pub const FILE = c.UV_FILE;
+    pub const FS_EVENT = c.UV_FS_EVENT;
+    pub const FS_POLL = c.UV_FS_POLL;
+    pub const HANDLE = c.UV_HANDLE;
+    pub const HANDLE_TYPE_MAX = c.UV_HANDLE_TYPE_MAX;
+    pub const IDLE = c.UV_IDLE;
+    pub const NAMED_PIPE = c.UV_NAMED_PIPE;
+    pub const POLL = c.UV_POLL;
+    pub const PREPARE = c.UV_PREPARE;
+    pub const PROCESS = c.UV_PROCESS;
+    pub const SIGNAL = c.UV_SIGNAL;
+    pub const STREAM = c.UV_STREAM;
+    pub const TCP = c.UV_TCP;
+    pub const TIMER = c.UV_TIMER;
+    pub const TTY = c.UV_TTY;
+    pub const UDP = c.UV_UDP;
+    pub const UNKNOWN_HANDLE = c.UV_UNKNOWN_HANDLE;
 };

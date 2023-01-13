@@ -24,8 +24,8 @@ pub fn main() !void {
     const alloc = std.heap.c_allocator;
     // Initialize the loop
     var loop = try alloc.create(uv.Loop);
-    try uv.Loop.init(loop);
     defer alloc.destroy(loop);
+    try uv.Loop.init(loop);
     // Initialize a timer
     var timer: uv.Timer = undefined;
     try timer.init(loop);
