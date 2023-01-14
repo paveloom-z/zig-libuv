@@ -9,6 +9,7 @@ pub usingnamespace @import("fs.zig");
 pub usingnamespace @import("handle.zig");
 pub usingnamespace @import("loop.zig");
 pub usingnamespace @import("misc.zig");
+pub usingnamespace @import("pipe.zig");
 pub usingnamespace @import("req.zig");
 pub usingnamespace @import("signal.zig");
 pub usingnamespace @import("stream.zig");

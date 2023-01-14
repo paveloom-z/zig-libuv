@@ -77,7 +77,7 @@ pub const Fs = extern struct {
         flags: c_int,
         mode: c_int,
         cb: FSCallback,
-    ) !void {
+    ) !c_int {
         const res = c.uv_fs_open(
             loop.toUV(),
             self.toUV(),
@@ -87,6 +87,7 @@ pub const Fs = extern struct {
             @ptrCast(FSCallbackUV, cb),
         );
         try check(res);
+        return res;
     }
     /// Read or write data into multiple buffers
     pub fn read(

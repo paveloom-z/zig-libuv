@@ -27,11 +27,13 @@ pub fn build(b: *std.build.Builder) !void {
     const dns = b.addExecutable("dns", "examples/dns.zig");
     const timer = b.addExecutable("timer", "examples/timer.zig");
     const uvcat = b.addExecutable("uvcat", "examples/uvcat.zig");
+    const uvtee = b.addExecutable("uvtee", "examples/uvtee.zig");
     // For each example
     inline for (.{
         dns,
         timer,
         uvcat,
+        uvtee,
     }) |step| {
         step.setTarget(target);
         step.setBuildMode(mode);
@@ -61,6 +63,7 @@ pub fn build(b: *std.build.Builder) !void {
         timer,
         unit_tests,
         uvcat,
+        uvtee,
     }) |step| {
         inline for (@typeInfo(deps.package_data).Struct.decls) |decl| {
             const pkg = @field(deps.package_data, decl.name);

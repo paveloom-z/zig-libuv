@@ -10,7 +10,7 @@ const utils = uv.utils;
 /// Base handle
 pub const Handle = extern struct {
     /// Type of a base handle
-    const Type = c.uv_handle_type;
+    pub const Type = c.uv_handle_type;
     const Self = @This();
     pub const UV = c.uv_handle_t;
     data: ?*anyopaque,
@@ -34,9 +34,9 @@ pub const Handle = extern struct {
 
 /// Base handle declarations
 pub const HandleDecls = struct {
-    pub const AllocCallback = ?fn (?*Handle, usize, ?*Buf) callconv(.C) void;
+    pub const AllocCallback = ?fn (*Handle, usize, *Buf) callconv(.C) void;
     pub const AllocCallbackUV = c.uv_alloc_cb;
-    pub const CloseCallback = ?fn (?*Handle) callconv(.C) void;
+    pub const CloseCallback = ?fn (*Handle) callconv(.C) void;
     pub const CloseCallbackUV = c.uv_close_cb;
     /// Returns `true` if the handle is active, `false` if it’s inactive
     pub fn isActive(handle: anytype) bool {

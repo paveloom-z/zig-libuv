@@ -39,9 +39,8 @@ fn onRead(
     defer alloc.destroy(buf.base);
     // If there are no more bytes to read
     if (nread_isize < 0) {
-        const nread_c_int = @intCast(c_int, nread_isize);
-        // If that's abnormal
-        uv.check(nread_c_int) catch |err| {
+        // If that's the end of the file
+        uv.check(@intCast(c_int, nread_isize)) catch |err| {
             if (err != uv.Error.UV_EOF) {
                 stderr.print("Couldn't read from the stream, got {}.\n", .{err}) catch {};
             }

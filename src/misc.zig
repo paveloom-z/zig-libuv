@@ -15,8 +15,11 @@ pub const Buf = extern struct {
     len: usize,
     usingnamespace Cast(Self);
     /// Construct a buffer
-    pub fn init(base: [*c]u8, len: c_uint) Self {
-        const buf = c.uv_buf_init(base, len);
+    pub fn init(slice: []u8) Self {
+        const buf = c.uv_buf_init(
+            slice.ptr,
+            @intCast(c_uint, slice.len),
+        );
         return Buf{
             .base = buf.base,
             .len = buf.len,

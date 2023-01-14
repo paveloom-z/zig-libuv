@@ -63,7 +63,7 @@ fn onOpen(req: *uv.Fs) callconv(.C) void {
         return;
     }
     // Initialize the buffer
-    iov = uv.Buf.init(&buffer, buffer.len);
+    iov = uv.Buf.init(&buffer);
     // Request to read the file
     read_req.read(loop, @intCast(c_int, req.result), &iov, 1, -1, onRead) catch |err| {
         stderr.print("Couldn't read the file, got {}.\n", .{err}) catch {};
@@ -85,15 +85,14 @@ pub fn main() !void {
         // If there is a second argument
         if (args.next()) |path| {
             // Request to open a file for reading
-            try open_req.open(loop, path, uv.O_RDONLY, 0, onOpen);
+            _ = try open_req.open(loop, path, uv.O_RDONLY, 0, onOpen);
+            // Run the loop
+            try loop.run(uv.RUN_DEFAULT);
         } else {
             // Suggest the user to provide one
-            const writer = std.io.getStdErr().writer();
-            try writer.print("Please, provide a path to a file.\n", .{});
+            try stderr.print("Please provide a path to a file.\n", .{});
         }
     }
-    // Run the loop
-    try loop.run(uv.RUN_DEFAULT);
     // Cleanup the requests
     open_req.cleanup();
     read_req.cleanup();

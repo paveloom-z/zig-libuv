@@ -167,7 +167,7 @@ pub const Write = extern struct {
     /// Write data to stream
     pub fn write(
         req: *Self,
-        handle: *Handle,
+        handle: *Stream,
         bufs: *const Buf,
         nbufs: c_uint,
         cb: WriteCallback,
@@ -175,7 +175,7 @@ pub const Write = extern struct {
         const res = c.uv_write(
             req.toUV(),
             handle.toUV(),
-            bufs.toUV(),
+            bufs.toConstUV(),
             nbufs,
             @ptrCast(WriteCallbackUV, cb),
         );
@@ -193,7 +193,7 @@ pub const Write = extern struct {
         const res = c.uv_write2(
             req.toUV(),
             handle.toUV(),
-            bufs.toUV(),
+            bufs.toConstUV(),
             nbufs,
             send_handle.toUV(),
             @ptrCast(WriteCallbackUV, cb),
