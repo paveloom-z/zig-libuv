@@ -257,7 +257,7 @@ pub const Barrier = extern union {
     }
     /// Wait on the barrier
     pub fn wait(self: *Self) !c_int {
-        const res = c.uv_barrier_destroy(self.toUV());
+        const res = c.uv_barrier_wait(self.toUV());
         try check(res);
         return res;
     }

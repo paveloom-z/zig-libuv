@@ -2,7 +2,7 @@ const std = @import("std");
 
 const uv = @import("libuv");
 
-const stderr = std.io.getStdErr().writer();
+const stdout = std.io.getStdOut().writer();
 
 /// Go, hare!
 fn hare(arg: ?*anyopaque) callconv(.C) void {
@@ -10,9 +10,9 @@ fn hare(arg: ?*anyopaque) callconv(.C) void {
     while (tracklen.* > 0) {
         tracklen.* -= 1;
         uv.sleep(1000);
-        stderr.print("Hare ran another step...\n", .{}) catch {};
+        stdout.print("Hare ran another step...\n", .{}) catch {};
     }
-    stderr.print("Hare done running!\n", .{}) catch {};
+    stdout.print("Hare done running!\n", .{}) catch {};
 }
 
 /// Go, tortoise!
@@ -20,10 +20,10 @@ fn tortoise(arg: ?*anyopaque) callconv(.C) void {
     var tracklen = @ptrCast(*usize, @alignCast(8, arg.?));
     while (tracklen.* > 0) {
         tracklen.* -= 1;
-        stderr.print("Tortoise ran another step\n", .{}) catch {};
+        stdout.print("Tortoise ran another step\n", .{}) catch {};
         uv.sleep(3000);
     }
-    stderr.print("Tortoise done running!\n", .{}) catch {};
+    stdout.print("Tortoise done running!\n", .{}) catch {};
 }
 
 /// Run the program
