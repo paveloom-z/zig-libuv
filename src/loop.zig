@@ -79,6 +79,18 @@ pub const Loop = extern struct {
     pub fn stop(self: *Self) void {
         c.uv_stop(self.toUV());
     }
+    /// Get the poll timeout
+    pub fn backendTimeout(self: *const Self) c_int {
+        return c.uv_backend_timeout(self.toConstUV());
+    }
+    /// Return the current timestamp in milliseconds
+    pub fn now(self: *const Self) u64 {
+        return c.uv_now(self.toConstUV());
+    }
+    /// Update the event loop’s concept of "now"
+    pub fn updateTime(self: *Self) u64 {
+        return c.uv_update_time(self.toUV());
+    }
     /// Walk the list of handles
     pub fn walk(self: *Self, walk_cb: WalkCallback, arg: ?*anyopaque) void {
         c.uv_walk(
@@ -86,6 +98,12 @@ pub const Loop = extern struct {
             @ptrCast(WalkCallbackUV, walk_cb),
             arg,
         );
+    }
+    /// Reinitialize any kernel state necessary in the
+    /// child process after a `fork(2)` system call
+    pub fn loopFork(self: *Self) !void {
+        const res = c.uv_loop_fork(self.toUV());
+        try check(res);
     }
     /// Close the loop
     pub fn close(self: *Self) !void {
