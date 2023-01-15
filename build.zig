@@ -25,12 +25,14 @@ pub fn build(b: *std.build.Builder) !void {
     };
     // Add examples
     const dns = b.addExecutable("dns", "examples/dns.zig");
+    const onchange = b.addExecutable("onchange", "examples/onchange.zig");
     const timer = b.addExecutable("timer", "examples/timer.zig");
     const uvcat = b.addExecutable("uvcat", "examples/uvcat.zig");
     const uvtee = b.addExecutable("uvtee", "examples/uvtee.zig");
     // For each example
     inline for (.{
         dns,
+        onchange,
         timer,
         uvcat,
         uvtee,
@@ -60,6 +62,7 @@ pub fn build(b: *std.build.Builder) !void {
     inline for (.{
         dns,
         lib,
+        onchange,
         timer,
         unit_tests,
         uvcat,

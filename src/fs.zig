@@ -23,14 +23,14 @@ pub usingnamespace struct {
 pub const Fs = extern struct {
     const Self = @This();
     pub const UV = c.uv_fs_t;
-    pub const FSCallback = ?fn (*Self) callconv(.C) void;
-    pub const FSCallbackUV = c.uv_fs_cb;
+    pub const FsCallback = ?fn (*Self) callconv(.C) void;
+    pub const FsCallbackUV = c.uv_fs_cb;
     data: ?*anyopaque,
     type: Req.Type,
     reserved: [6]?*anyopaque,
     fs_type: c_int,
     loop: *Loop,
-    cb: FSCallbackUV,
+    cb: FsCallbackUV,
     result: isize,
     ptr: ?*anyopaque,
     path: ?[*:0]const u8,
@@ -59,13 +59,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         file: File,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_close(
             loop.toUV(),
             self.toUV(),
             file,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -76,7 +76,7 @@ pub const Fs = extern struct {
         path: ?[*:0]const u8,
         flags: c_int,
         mode: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !c_int {
         const res = c.uv_fs_open(
             loop.toUV(),
@@ -84,7 +84,7 @@ pub const Fs = extern struct {
             path,
             flags,
             mode,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
         return res;
@@ -97,7 +97,7 @@ pub const Fs = extern struct {
         bufs: *const Buf,
         nbufs: c_uint,
         offset: i64,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_read(
             loop.toUV(),
@@ -106,7 +106,7 @@ pub const Fs = extern struct {
             bufs.toConstUV(),
             nbufs,
             offset,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -115,13 +115,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_unlink(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -133,7 +133,7 @@ pub const Fs = extern struct {
         bufs: *const Buf,
         nbufs: c_uint,
         offset: i64,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_write(
             loop.toUV(),
@@ -142,7 +142,7 @@ pub const Fs = extern struct {
             bufs.toConstUV(),
             nbufs,
             offset,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -152,14 +152,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         path: ?*const u8,
         mode: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_mkdir(
             loop.toUV(),
             self.toUV(),
             path,
             mode,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -168,13 +168,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         tpl: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_mkdtemp(
             loop.toUV(),
             self.toUV(),
             tpl,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -183,13 +183,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         tpl: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_mkstemp(
             loop.toUV(),
             self.toUV(),
             tpl,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -198,13 +198,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_rmdir(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -213,13 +213,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_opendir(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -228,13 +228,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         dir: *Dir,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_closedir(
             loop.toUV(),
             self.toUV(),
             dir,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -243,13 +243,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         dir: *Dir,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_readdir(
             loop.toUV(),
             self.toUV(),
             dir,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -259,14 +259,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         path: ?*const u8,
         flags: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_scandir(
             loop.toUV(),
             self.toUV(),
             path,
             flags,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -280,13 +280,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_stat(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -295,13 +295,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         file: File,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_fstat(
             loop.toUV(),
             self.toUV(),
             file,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -310,13 +310,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_lstat(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -325,13 +325,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_statfs(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -341,14 +341,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         path: ?*const u8,
         new_path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_rename(
             loop.toUV(),
             self.toUV(),
             path,
             new_path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -357,13 +357,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         file: File,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_fsync(
             loop.toUV(),
             self.toUV(),
             file,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -372,13 +372,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         file: File,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_fdatasync(
             loop.toUV(),
             self.toUV(),
             file,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -388,14 +388,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         file: File,
         offset: i64,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_ftruncate(
             loop.toUV(),
             self.toUV(),
             file,
             offset,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -406,7 +406,7 @@ pub const Fs = extern struct {
         path: [*c]const u8,
         new_path: [*c]const u8,
         flags: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_copyfile(
             loop.toUV(),
@@ -414,7 +414,7 @@ pub const Fs = extern struct {
             path,
             new_path,
             flags,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -426,7 +426,7 @@ pub const Fs = extern struct {
         in_fd: File,
         in_offset: i64,
         length: usize,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_sendfile(
             loop.toUV(),
@@ -435,7 +435,7 @@ pub const Fs = extern struct {
             in_fd,
             in_offset,
             length,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -445,14 +445,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         path: ?*const u8,
         mode: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_access(
             loop.toUV(),
             self.toUV(),
             path,
             mode,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -462,14 +462,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         path: ?*const u8,
         mode: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_chmod(
             loop.toUV(),
             self.toUV(),
             path,
             mode,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -479,14 +479,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         file: File,
         mode: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_fchmod(
             loop.toUV(),
             self.toUV(),
             file,
             mode,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -497,7 +497,7 @@ pub const Fs = extern struct {
         path: ?*const u8,
         atime: f64,
         mtime: f64,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_utime(
             loop.toUV(),
@@ -505,7 +505,7 @@ pub const Fs = extern struct {
             path,
             atime,
             mtime,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -516,7 +516,7 @@ pub const Fs = extern struct {
         file: File,
         atime: f64,
         mtime: f64,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_futime(
             loop.toUV(),
@@ -524,7 +524,7 @@ pub const Fs = extern struct {
             file,
             atime,
             mtime,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -535,7 +535,7 @@ pub const Fs = extern struct {
         path: ?*const u8,
         atime: f64,
         mtime: f64,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_lutime(
             loop.toUV(),
@@ -543,7 +543,7 @@ pub const Fs = extern struct {
             path,
             atime,
             mtime,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -553,14 +553,14 @@ pub const Fs = extern struct {
         loop: *Loop,
         path: ?*const u8,
         new_path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_link(
             loop.toUV(),
             self.toUV(),
             path,
             new_path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -571,7 +571,7 @@ pub const Fs = extern struct {
         path: ?*const u8,
         new_path: ?*const u8,
         flags: c_int,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_symlink(
             loop.toUV(),
@@ -579,7 +579,7 @@ pub const Fs = extern struct {
             path,
             new_path,
             flags,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -588,13 +588,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_readlink(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -603,13 +603,13 @@ pub const Fs = extern struct {
         self: *Self,
         loop: *Loop,
         path: ?*const u8,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_realpath(
             loop.toUV(),
             self.toUV(),
             path,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -620,7 +620,7 @@ pub const Fs = extern struct {
         path: ?*const u8,
         uid: c.uv_uid_t,
         gid: c.uv_gid_t,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_chown(
             loop.toUV(),
@@ -628,7 +628,7 @@ pub const Fs = extern struct {
             path,
             uid,
             gid,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -639,7 +639,7 @@ pub const Fs = extern struct {
         file: File,
         uid: c.uv_uid_t,
         gid: c.uv_gid_t,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_fchown(
             loop.toUV(),
@@ -647,7 +647,7 @@ pub const Fs = extern struct {
             file,
             uid,
             gid,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }
@@ -658,7 +658,7 @@ pub const Fs = extern struct {
         path: ?*const u8,
         uid: c.uv_uid_t,
         gid: c.uv_gid_t,
-        cb: FSCallback,
+        cb: FsCallback,
     ) !void {
         const res = c.uv_fs_lchown(
             loop.toUV(),
@@ -666,7 +666,7 @@ pub const Fs = extern struct {
             path,
             uid,
             gid,
-            @ptrCast(FSCallbackUV, cb),
+            @ptrCast(FsCallbackUV, cb),
         );
         try check(res);
     }

@@ -6,6 +6,7 @@ pub usingnamespace @import("cast.zig");
 pub usingnamespace @import("dns.zig");
 pub usingnamespace @import("error.zig");
 pub usingnamespace @import("fs.zig");
+pub usingnamespace @import("fs_event.zig");
 pub usingnamespace @import("handle.zig");
 pub usingnamespace @import("loop.zig");
 pub usingnamespace @import("misc.zig");

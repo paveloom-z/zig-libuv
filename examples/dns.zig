@@ -145,7 +145,7 @@ fn onWalk(maybe_handle: ?*uv.Handle, arg: ?*anyopaque) callconv(.C) void {
     _ = arg;
     // If the handle is still there
     if (maybe_handle) |handle| {
-        // If the handle isn't being closed alread
+        // If the handle isn't being closed already
         if (!handle.isClosing()) {
             // Request to close the handle
             handle.close(onClose);
