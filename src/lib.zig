@@ -15,4 +15,5 @@ pub usingnamespace @import("req.zig");
 pub usingnamespace @import("signal.zig");
 pub usingnamespace @import("stream.zig");
 pub usingnamespace @import("tcp.zig");
+pub usingnamespace @import("thread.zig");
 pub usingnamespace @import("timer.zig");

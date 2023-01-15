@@ -47,3 +47,8 @@ pub fn ip4Addr(ip: []const u8, port: c_int, addr: *SockAddrIn) !void {
     const res = c.uv_ip4_addr(@ptrCast(*const u8, ip), port, addr.toUV());
     try check(res);
 }
+
+/// Causes the calling thread to sleep for `msec` milliseconds
+pub fn sleep(msec: c_uint) void {
+    c.uv_sleep(msec);
+}
