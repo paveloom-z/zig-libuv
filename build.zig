@@ -1,7 +1,5 @@
 const std = @import("std");
 
-const deps = @import("deps.zig");
-
 pub fn build(b: *std.build.Builder) !void {
     // Add standard target options
     const target = b.standardTargetOptions(.{});
@@ -41,6 +39,7 @@ pub fn build(b: *std.build.Builder) !void {
         uvcat,
         uvtee,
     }) |step| {
+        // Make sure they can be built and installed
         step.setTarget(target);
         step.setBuildMode(mode);
         step.install();
@@ -74,19 +73,9 @@ pub fn build(b: *std.build.Builder) !void {
         uvcat,
         uvtee,
     }) |step| {
-        inline for (@typeInfo(deps.package_data).Struct.decls) |decl| {
-            const pkg = @field(deps.package_data, decl.name);
-            // Add the include paths
-            inline for (pkg.c_include_dirs) |path| {
-                step.addIncludePath(@field(deps.dirs, decl.name) ++ "/" ++ path);
-            }
-            // Add the C source files
-            inline for (pkg.c_source_files) |path| {
-                step.addCSourceFile(@field(deps.dirs, decl.name) ++ "/" ++ path, pkg.c_source_flags);
-            }
-        }
-        // Link the C library
+        // Link the libraries
         step.linkLibC();
+        step.linkSystemLibrary("libuv");
         // Use the `stage1` compiler because of
         // https://github.com/ziglang/zig/issues/12325
         step.use_stage1 = true;

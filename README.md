@@ -11,12 +11,10 @@ Repository:
 
 Make sure you have installed:
 
+- A development library for `libuv`
 - [Zig](https://ziglang.org) (`v0.10.0`)
-- [Zigmod](https://github.com/nektro/zigmod)
 
 #### Build
-
-First, fetch the dependencies with `zigmod fetch`.
 
 To build and install the library, run `zig build install`.
 
@@ -36,12 +34,12 @@ To integrate the bindings into your project:
       - src: git https://github.com/paveloom-z/zig-libuv
     ```
 
-2) Make sure you build the C sources in your build script:
+2) Make sure you have added the dependencies in your build script:
 
     ```zig
     // <...>
     const deps = @import("deps.zig");
-    const libuv_pkg = deps.pkgs.clap.pkg.?;
+    const libuv_pkg = deps.pkgs.libuv.pkg.?;
     // <...>
     pub fn build(b: *std.build.Builder) !void {
       // <...>
@@ -49,20 +47,9 @@ To integrate the bindings into your project:
       inline for (steps) |step| {
           // Add the library package
           step.addPackage(libuv_pkg);
-          // Add the dependencies
-          inline for (@typeInfo(deps.package_data).Struct.decls) |decl| {
-              const pkg = @field(deps.package_data, decl.name);
-              // Add the include paths
-              inline for (pkg.c_include_dirs) |path| {
-                  step.addIncludePath(@field(deps.dirs, decl.name) ++ "/" ++ path);
-              }
-              // Add the C source files
-              inline for (pkg.c_source_files) |path| {
-                  step.addCSourceFile(@field(deps.dirs, decl.name) ++ "/" ++ path, pkg.c_source_flags);
-              }
-          }
-          // Link the C library
+          // Link the libraries
           step.linkLibC();
+          step.linkSystemLibrary("libuv");
           // Use the `stage1` compiler because of
           // https://github.com/ziglang/zig/issues/12325
           step.use_stage1 = true;
@@ -70,3 +57,5 @@ To integrate the bindings into your project:
       // <...>
     }
     ```
+
+    If you'd like a static build, take a look at the stab in the [`zigmod.yml`](zigmod.yml) file.
