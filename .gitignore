@@ -4,6 +4,7 @@ zig-out
 
 # Zigmod
 .zigmod
+.zigmod.lock
 deps.zig
 
 # Valgrind
