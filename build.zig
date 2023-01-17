@@ -25,6 +25,7 @@ pub fn build(b: *std.build.Builder) !void {
     const dns = b.addExecutable("dns", "examples/dns.zig");
     const locks = b.addExecutable("locks", "examples/locks.zig");
     const onchange = b.addExecutable("onchange", "examples/onchange.zig");
+    const queue_work = b.addExecutable("queue_work", "examples/queue_work.zig");
     const thread_create = b.addExecutable("thread_create", "examples/thread_create.zig");
     const timer = b.addExecutable("timer", "examples/timer.zig");
     const uvcat = b.addExecutable("uvcat", "examples/uvcat.zig");
@@ -34,6 +35,7 @@ pub fn build(b: *std.build.Builder) !void {
         dns,
         locks,
         onchange,
+        queue_work,
         thread_create,
         timer,
         uvcat,
@@ -67,6 +69,7 @@ pub fn build(b: *std.build.Builder) !void {
         lib,
         locks,
         onchange,
+        queue_work,
         thread_create,
         timer,
         unit_tests,
