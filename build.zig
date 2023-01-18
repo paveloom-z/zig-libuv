@@ -26,6 +26,7 @@ pub fn build(b: *std.build.Builder) !void {
     const dns = b.addExecutable("dns", "examples/dns.zig");
     const locks = b.addExecutable("locks", "examples/locks.zig");
     const onchange = b.addExecutable("onchange", "examples/onchange.zig");
+    const proc_streams = b.addExecutable("proc_streams", "examples/proc_streams.zig");
     const progress = b.addExecutable("progress", "examples/progress.zig");
     const queue_work = b.addExecutable("queue_work", "examples/queue_work.zig");
     const signal = b.addExecutable("signal", "examples/signal.zig");
@@ -40,6 +41,7 @@ pub fn build(b: *std.build.Builder) !void {
         dns,
         locks,
         onchange,
+        proc_streams,
         progress,
         queue_work,
         signal,
@@ -78,6 +80,7 @@ pub fn build(b: *std.build.Builder) !void {
         lib,
         locks,
         onchange,
+        proc_streams,
         progress,
         queue_work,
         signal,

@@ -48,6 +48,12 @@ pub fn ip4Addr(ip: []const u8, port: c_int, addr: *SockAddrIn) !void {
     try check(res);
 }
 
+/// Get the executable path
+pub fn exePath(path: []u8) !void {
+    const res = c.uv_exepath(path.ptr, path.len);
+    try check(res);
+}
+
 /// Causes the calling thread to sleep for `msec` milliseconds
 pub fn sleep(msec: c_uint) void {
     c.uv_sleep(msec);

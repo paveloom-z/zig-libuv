@@ -16,12 +16,12 @@ pub const ProcessOptions = extern struct {
     pub const UV = c.uv_process_options_t;
     exit_cb: Process.ExitCallbackUV,
     file: [*c]const u8,
-    args: [*c][*c]u8,
+    args: [*]const ?[*:0]const u8,
     env: [*c][*c]u8,
     cwd: [*c]const u8,
     flags: c_uint,
     stdio_count: c_int,
-    stdio: ?*StdIOContainer,
+    stdio: ?[*]StdIOContainer,
     uid: c.uv_uid_t,
     gid: c.uv_gid_t,
     usingnamespace Cast(Self);

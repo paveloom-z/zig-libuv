@@ -25,12 +25,20 @@ pub fn main() !void {
     loop = try alloc.create(uv.Loop);
     defer alloc.destroy(loop);
     try uv.Loop.init(loop);
-    // Prepare arguments
-    const args = [_]?[*:0]const u8{ "mkdir", "test-dir", null };
-    // Set process options
-    options.args = &args;
+    // Prepare the arguments
+    const args = [_]?[*:0]const u8{ "echo", "Hello there!", null };
+    // Set up the streams
+    options.stdio_count = 3;
+    var child_stdio: [3]uv.StdIOContainer = undefined;
+    child_stdio[0].flags = uv.IGNORE;
+    child_stdio[1].flags = uv.INHERIT_FD;
+    child_stdio[1].data.fd = 1;
+    child_stdio[2].flags = uv.IGNORE;
+    options.stdio = &child_stdio;
+    // Set up the process options
     options.exit_cb = @ptrCast(uv.Process.ExitCallbackUV, onExit);
-    options.file = "mkdir";
+    options.file = args[0];
+    options.args = &args;
     // Spawn a process
     try process.spawn(loop, &options);
     try stdout.print("Launched process with ID {}\n", .{process.pid});

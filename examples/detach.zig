@@ -19,9 +19,9 @@ pub fn main() !void {
     defer alloc.destroy(loop);
     try uv.Loop.init(loop);
     // Prepare arguments
-    var args = [_][*c]const u8{ "sleep", "10", null };
+    const args = [_]?[*:0]const u8{ "sleep", "10", null };
     // Set process options
-    options.args = @ptrCast([*c][*c]u8, &args);
+    options.args = &args;
     options.exit_cb = null;
     options.file = "sleep";
     options.flags = uv.PROCESS_DETACHED;
