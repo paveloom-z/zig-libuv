@@ -27,6 +27,7 @@ pub fn build(b: *std.build.Builder) !void {
     const onchange = b.addExecutable("onchange", "examples/onchange.zig");
     const progress = b.addExecutable("progress", "examples/progress.zig");
     const queue_work = b.addExecutable("queue_work", "examples/queue_work.zig");
+    const spawn = b.addExecutable("spawn", "examples/spawn.zig");
     const thread_create = b.addExecutable("thread_create", "examples/thread_create.zig");
     const timer = b.addExecutable("timer", "examples/timer.zig");
     const uvcat = b.addExecutable("uvcat", "examples/uvcat.zig");
@@ -38,6 +39,7 @@ pub fn build(b: *std.build.Builder) !void {
         onchange,
         progress,
         queue_work,
+        spawn,
         thread_create,
         timer,
         uvcat,
@@ -73,6 +75,7 @@ pub fn build(b: *std.build.Builder) !void {
         onchange,
         progress,
         queue_work,
+        spawn,
         thread_create,
         timer,
         unit_tests,
