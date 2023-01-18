@@ -12,6 +12,7 @@ const check = uv.check;
 pub const Timer = struct {
     const Self = @This();
     pub const UV = c.uv_timer_t;
+    /// Type definition for callback passed to `start`
     pub const TimerCallback = ?fn (*Self) callconv(.C) void;
     pub const TimerCallbackUV = c.uv_timer_cb;
     data: ?*anyopaque,

@@ -20,6 +20,7 @@ pub const ThreadOptions = extern struct {
 pub const Thread = extern struct {
     const Self = @This();
     pub const UV = c.uv_thread_t;
+    /// Callback that is invoked to initialize thread execution
     pub const ThreadCallback = ?fn (?*anyopaque) callconv(.C) void;
     pub const ThreadCallbackUV = c.uv_thread_cb;
     self: c_ulong,

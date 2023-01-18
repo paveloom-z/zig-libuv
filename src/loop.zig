@@ -12,6 +12,7 @@ pub const Loop = extern struct {
     pub const RunMode = c.uv_run_mode;
     const Self = @This();
     pub const UV = c.uv_loop_t;
+    /// Type definition for callback passed to `walk`
     pub const WalkCallback = ?fn (*Handle, ?*anyopaque) callconv(.C) void;
     pub const WalkCallbackUV = c.uv_walk_cb;
     data: ?*anyopaque,

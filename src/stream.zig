@@ -43,10 +43,13 @@ pub const Stream = extern struct {
 
 /// Stream handle declarations
 pub const StreamDecls = struct {
+    /// Callback called after a connection started by `connect` is done
     pub const ConnectCallback = ?fn (*Connect, c_int) callconv(.C) void;
     pub const ConnectCallbackUV = c.uv_connect_cb;
+    /// Callback called when a stream server has received an incoming connection
     pub const ConnectionCallback = ?fn (*Stream, c_int) callconv(.C) void;
     pub const ConnectionCallbackUV = c.uv_connection_cb;
+    /// Callback called when data was read on a stream
     pub const ReadCallback = ?fn (*Stream, isize, *const Buf) callconv(.C) void;
     pub const ReadCallbackUV = c.uv_read_cb;
     /// Start listening for incoming connections
@@ -130,6 +133,7 @@ pub const Connect = extern struct {
 pub const Shutdown = extern struct {
     const Self = @This();
     pub const UV = c.uv_shutdown_t;
+    /// Callback called after a shutdown request has been completed
     pub const ShutdownCallback = ?fn (*Self, c_int) callconv(.C) void;
     pub const ShutdownCallbackUV = c.uv_shutdown_cb;
     data: ?*anyopaque,
@@ -149,6 +153,7 @@ pub const Shutdown = extern struct {
 pub const Write = extern struct {
     const Self = @This();
     pub const UV = c.uv_write_t;
+    /// Callback called after data was written on a stream
     pub const WriteCallback = ?fn (*Self, c_int) callconv(.C) void;
     pub const WriteCallbackUV = c.uv_write_cb;
     data: ?*anyopaque,

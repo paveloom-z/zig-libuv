@@ -23,6 +23,7 @@ pub usingnamespace struct {
 pub const Fs = extern struct {
     const Self = @This();
     pub const UV = c.uv_fs_t;
+    /// Callback called on a file system operation
     pub const FsCallback = ?fn (*Self) callconv(.C) void;
     pub const FsCallbackUV = c.uv_fs_cb;
     data: ?*anyopaque,

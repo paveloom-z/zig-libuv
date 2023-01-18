@@ -13,7 +13,14 @@ const check = uv.check;
 pub const FsEvent = extern struct {
     const Self = @This();
     pub const UV = c.uv_fs_event_t;
-    pub const FsEventCallback = ?fn (*Self, [*c]const u8, c_int, c_int) callconv(.C) void;
+    /// Callback passed to `eventStart` which will be
+    /// called repeatedly after the handle is started
+    pub const FsEventCallback = ?fn (
+        *Self,
+        [*c]const u8,
+        c_int,
+        c_int,
+    ) callconv(.C) void;
     pub const FsEventCallbackUV = c.uv_fs_event_cb;
     data: ?*anyopaque,
     loop: ?*Loop,

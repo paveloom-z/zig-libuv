@@ -14,7 +14,14 @@ const ip4Addr = uv.ip4Addr;
 pub const GetNameInfo = struct {
     const Self = @This();
     pub const UV = c.uv_getnameinfo_t;
-    pub const Callback = ?fn (*Self, c_int, *const u8, *const u8) callconv(.C) void;
+    /// Callback which will be called with the
+    /// `getnameinfo` request result once complete
+    pub const Callback = ?fn (
+        *Self,
+        c_int,
+        *const u8,
+        *const u8,
+    ) callconv(.C) void;
     pub const CallbackUV = c.uv_getnameinfo_cb;
     data: ?*anyopaque,
     type: c.uv_req_type,

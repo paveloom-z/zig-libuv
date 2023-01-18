@@ -34,8 +34,10 @@ pub const Handle = extern struct {
 
 /// Base handle declarations
 pub const HandleDecls = struct {
+    /// Type definition for callback passed to `Stream.readStart` and `Udp.recvStart`
     pub const AllocCallback = ?fn (*Handle, usize, *Buf) callconv(.C) void;
     pub const AllocCallbackUV = c.uv_alloc_cb;
+    /// Type definition for callback passed to `close`
     pub const CloseCallback = ?fn (*Handle) callconv(.C) void;
     pub const CloseCallbackUV = c.uv_close_cb;
     /// Returns `true` if the handle is active, `false` if it’s inactive

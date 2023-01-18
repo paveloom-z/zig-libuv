@@ -13,6 +13,7 @@ const check = uv.check;
 pub const Signal = extern struct {
     const Self = @This();
     pub const UV = c.uv_signal_t;
+    /// Type definition for callback passed to `start`
     pub const SignalCallback = ?fn (*Self, c_int) callconv(.C) void;
     pub const SignalCallbackUV = c.uv_signal_cb;
     data: ?*anyopaque,
