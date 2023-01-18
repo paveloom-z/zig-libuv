@@ -69,3 +69,41 @@ pub const Signal = extern struct {
         try check(res);
     }
 };
+
+/// Signals
+pub usingnamespace struct {
+    pub const SIGABRT = c.SIGABRT;
+    pub const SIGALRM = c.SIGALRM;
+    pub const SIGBUS = c.SIGBUS;
+    pub const SIGCHLD = c.SIGCHLD;
+    pub const SIGCLD = c.SIGCLD;
+    pub const SIGCONT = c.SIGCONT;
+    pub const SIGFPE = c.SIGFPE;
+    pub const SIGHUP = c.SIGHUP;
+    pub const SIGILL = c.SIGILL;
+    pub const SIGINT = c.SIGINT;
+    pub const SIGIO = c.SIGIO;
+    pub const SIGIOT = c.SIGIOT;
+    pub const SIGKILL = c.SIGKILL;
+    pub const SIGPIPE = c.SIGPIPE;
+    pub const SIGPOLL = c.SIGPOLL;
+    pub const SIGPROF = c.SIGPROF;
+    pub const SIGPWR = c.SIGPWR;
+    pub const SIGQUIT = c.SIGQUIT;
+    pub const SIGSEGV = c.SIGSEGV;
+    pub const SIGSTKFLT = c.SIGSTKFLT;
+    pub const SIGSTOP = c.SIGSTOP;
+    pub const SIGSYS = c.SIGSYS;
+    pub const SIGTERM = c.SIGTERM;
+    pub const SIGTRAP = c.SIGTRAP;
+    pub const SIGTSTP = c.SIGTSTP;
+    pub const SIGTTIN = c.SIGTTIN;
+    pub const SIGTTOU = c.SIGTTOU;
+    pub const SIGURG = c.SIGURG;
+    pub const SIGUSR1 = c.SIGUSR1;
+    pub const SIGUSR2 = c.SIGUSR2;
+    pub const SIGVTALRM = c.SIGVTALRM;
+    pub const SIGWINCH = c.SIGWINCH;
+    pub const SIGXCPU = c.SIGXCPU;
+    pub const SIGXFSZ = c.SIGXFSZ;
+};
