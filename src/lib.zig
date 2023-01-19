@@ -14,6 +14,7 @@ pub usingnamespace @import("idle.zig");
 pub usingnamespace @import("loop.zig");
 pub usingnamespace @import("misc.zig");
 pub usingnamespace @import("pipe.zig");
+pub usingnamespace @import("poll.zig");
 pub usingnamespace @import("prepare.zig");
 pub usingnamespace @import("process.zig");
 pub usingnamespace @import("req.zig");
