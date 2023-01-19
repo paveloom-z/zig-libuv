@@ -12,6 +12,7 @@ pub usingnamespace @import("fs_event.zig");
 pub usingnamespace @import("fs_poll.zig");
 pub usingnamespace @import("handle.zig");
 pub usingnamespace @import("idle.zig");
+pub usingnamespace @import("lib.zig");
 pub usingnamespace @import("loop.zig");
 pub usingnamespace @import("misc.zig");
 pub usingnamespace @import("pipe.zig");

@@ -115,8 +115,8 @@ pub const Udp = extern struct {
     /// Set membership for a multicast address
     pub fn setMembership(
         handle: *Self,
-        multicast_addr: ?[*]const u8,
-        interface_addr: ?[*]const u8,
+        multicast_addr: ?[*:0]const u8,
+        interface_addr: ?[*:0]const u8,
         membership: Udp.Membership,
     ) !void {
         const res = c.uv_udp_set_membership(
@@ -130,9 +130,9 @@ pub const Udp = extern struct {
     /// Set membership for a source-specific multicast group.
     pub fn setSourceMembership(
         handle: *Self,
-        multicast_addr: ?[*]const u8,
-        interface_addr: ?[*]const u8,
-        source_addr: ?[*]const u8,
+        multicast_addr: ?[*:0]const u8,
+        interface_addr: ?[*:0]const u8,
+        source_addr: ?[*:0]const u8,
         membership: Udp.Membership,
     ) !void {
         const res = c.uv_udp_set_source_membership(
