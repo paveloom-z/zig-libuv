@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const uv = @import("libuv");
+const uv = @import("uv");
 
 var blocker: uv.Barrier = undefined;
 var numlock: uv.RWLock = undefined;

@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const uv = @import("libuv");
+const uv = @import("uv");
 
 /// A callback for the timer
 fn timerCallback(maybe_handle: ?*uv.Timer) callconv(.C) void {

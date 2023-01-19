@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const uv = @import("libuv");
+const uv = @import("uv");
 
 const alloc = std.heap.c_allocator;
 

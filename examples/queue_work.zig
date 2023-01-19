@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const uv = @import("libuv");
+const uv = @import("uv");
 
 const alloc = std.heap.c_allocator;
 var loop: *uv.Loop = undefined;
@@ -66,7 +66,7 @@ fn onInterrupt(handle: *uv.Signal, signum: c_int) callconv(.C) void {
     _ = handle;
     _ = signum;
     // Cancel all requests
-    stderr.print("\rCancelling...", .{}) catch {};
+    stderr.print("\rCancelling...\n", .{}) catch {};
     var i: usize = 0;
     while (i < FIB_UNTIL) : (i += 1) {
         fib_reqs[i].cancel() catch {};

@@ -6,19 +6,19 @@ pub fn build(b: *std.build.Builder) !void {
     // Add standard release options
     const mode = b.standardReleaseOptions();
     // Add the library
-    const lib = b.addStaticLibrary("libuv", "src/lib.zig");
-    lib.setBuildMode(mode);
-    lib.install();
+    const uv = b.addStaticLibrary("uv", "src/uv.zig");
+    uv.setBuildMode(mode);
+    uv.install();
     // Add the unit tests
     const unit_tests_step = b.step("test", "Run the unit tests");
-    const unit_tests = b.addTest("src/lib.zig");
+    const unit_tests = b.addTest("src/uv.zig");
     unit_tests.setBuildMode(mode);
     unit_tests_step.dependOn(&unit_tests.step);
     unit_tests.test_evented_io = true;
     // Define the library package
-    const libuv_pkg = std.build.Pkg{
-        .name = "libuv",
-        .source = .{ .path = "src/lib.zig" },
+    const uv_pkg = std.build.Pkg{
+        .name = "uv",
+        .source = .{ .path = "src/uv.zig" },
         .dependencies = &.{},
     };
     // Add examples
@@ -60,7 +60,7 @@ pub fn build(b: *std.build.Builder) !void {
         step.setBuildMode(mode);
         step.install();
         // Add the library package
-        step.addPackage(libuv_pkg);
+        step.addPackage(uv_pkg);
         // Add a run step
         if (step.install_step) |install_step| {
             const run_step_name = try std.mem.concat(
@@ -82,7 +82,6 @@ pub fn build(b: *std.build.Builder) !void {
         cgi,
         detach,
         dns,
-        lib,
         locks,
         onchange,
         proc_streams,
@@ -93,6 +92,7 @@ pub fn build(b: *std.build.Builder) !void {
         thread_create,
         timer,
         unit_tests,
+        uv,
         uvcat,
         uvstop,
         uvtee,

@@ -1,8 +1,8 @@
-const uv = @import("lib.zig");
+const uv = @import("uv.zig");
 
 const c = uv.c;
 
-/// A `libuv` error
+/// A `uv` error
 pub const Error = error{
     /// Argument list too long
     UV_E2BIG,

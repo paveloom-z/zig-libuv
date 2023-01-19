@@ -1,6 +1,6 @@
 id: epcocwwj699ioorm5azr1633k642ax0svapyhwfrat8sdn1m
-name: libuv
-main: src/lib.zig
+name: uv
+main: src/uv.zig
 license: MIT
 description: Zig bindings for the `libuv` library
 dependencies:

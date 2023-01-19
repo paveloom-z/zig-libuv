@@ -39,14 +39,14 @@ To integrate the bindings into your project:
     ```zig
     // <...>
     const deps = @import("deps.zig");
-    const libuv_pkg = deps.pkgs.libuv.pkg.?;
+    const uv_pkg = deps.pkgs.uv.pkg.?;
     // <...>
     pub fn build(b: *std.build.Builder) !void {
       // <...>
       // For each step
       inline for (steps) |step| {
           // Add the library package
-          step.addPackage(libuv_pkg);
+          step.addPackage(uv_pkg);
           // Link the libraries
           step.linkLibC();
           step.linkSystemLibrary("libuv");

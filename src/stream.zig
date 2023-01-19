@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const uv = @import("lib.zig");
+const uv = @import("uv.zig");
 
 const Buf = uv.Buf;
 const Cast = uv.Cast;
