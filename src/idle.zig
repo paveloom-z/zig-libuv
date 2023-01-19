@@ -37,7 +37,10 @@ pub const Idle = extern struct {
     }
     /// Start the handle with the given callback
     pub fn start(self: *Self, cb: IdleCallback) !void {
-        const res = c.uv_idle_start(self.toUV(), @ptrCast(IdleCallbackUV, cb));
+        const res = c.uv_idle_start(
+            self.toUV(),
+            @ptrCast(IdleCallbackUV, cb),
+        );
         try check(res);
     }
     /// Stop the handle

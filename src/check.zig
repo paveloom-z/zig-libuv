@@ -9,13 +9,13 @@ const Loop = uv.Loop;
 const c = uv.c;
 const check = uv.check;
 
-/// Prepare handle
-pub const Prepare = extern struct {
+/// Check handle
+pub const Check = extern struct {
     const Self = @This();
-    pub const UV = c.uv_prepare_t;
+    pub const UV = c.uv_check_t;
     /// Type definition for callback passed to `start`
-    pub const PrepareCallback = ?fn (*Self) callconv(.C) void;
-    pub const PrepareCallbackUV = c.uv_prepare_cb;
+    pub const CheckCallback = ?fn (*Self) callconv(.C) void;
+    pub const CheckCallbackUV = c.uv_check_cb;
     data: ?*anyopaque,
     loop: ?*Loop,
     type: Handle.Type,
@@ -27,24 +27,24 @@ pub const Prepare = extern struct {
     },
     next_closing: ?*Handle,
     flags: c_uint,
-    prepare_cb: PrepareCallbackUV,
+    check_cb: CheckCallbackUV,
     queue: [2]?*anyopaque,
     usingnamespace Cast(Self);
     usingnamespace HandleDecls;
     /// Initialize the handle
     pub fn init(self: *Self, loop: *Loop) void {
-        _ = c.uv_prepare_init(loop.toUV(), self.toUV());
+        _ = c.uv_check_init(loop.toUV(), self.toUV());
     }
     /// Start the handle with the given callback
-    pub fn start(self: *Self, cb: PrepareCallback) !void {
-        const res = c.uv_prepare_start(
+    pub fn start(self: *Self, cb: CheckCallback) !void {
+        const res = c.uv_check_start(
             self.toUV(),
-            @ptrCast(PrepareCallbackUV, cb),
+            @ptrCast(CheckCallbackUV, cb),
         );
         try check(res);
     }
     /// Stop the handle
     pub fn stop(self: *Self) !void {
-        _ = c.uv_prepare_stop(self.toUV());
+        _ = c.uv_check_stop(self.toUV());
     }
 };

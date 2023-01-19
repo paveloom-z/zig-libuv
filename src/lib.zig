@@ -4,6 +4,7 @@ pub const c = @import("c.zig");
 
 pub usingnamespace @import("async.zig");
 pub usingnamespace @import("cast.zig");
+pub usingnamespace @import("check.zig");
 pub usingnamespace @import("dns.zig");
 pub usingnamespace @import("error.zig");
 pub usingnamespace @import("fs.zig");
