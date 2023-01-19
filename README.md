@@ -12,7 +12,7 @@ Repository:
 Make sure you have installed:
 
 - A development library for `libuv`
-- [Zig](https://ziglang.org) (`v0.10.0`)
+- [Zig](https://ziglang.org) (`v0.10.1`)
 
 #### Build
 
