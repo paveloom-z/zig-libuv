@@ -35,6 +35,7 @@ pub fn build(b: *std.build.Builder) !void {
     const thread_create = b.addExecutable("thread_create", "examples/thread_create.zig");
     const timer = b.addExecutable("timer", "examples/timer.zig");
     const uvcat = b.addExecutable("uvcat", "examples/uvcat.zig");
+    const uvstop = b.addExecutable("uvstop", "examples/uvstop.zig");
     const uvtee = b.addExecutable("uvtee", "examples/uvtee.zig");
     // For each example
     inline for (.{
@@ -51,6 +52,7 @@ pub fn build(b: *std.build.Builder) !void {
         thread_create,
         timer,
         uvcat,
+        uvstop,
         uvtee,
     }) |step| {
         // Make sure they can be built and installed
@@ -92,6 +94,7 @@ pub fn build(b: *std.build.Builder) !void {
         timer,
         unit_tests,
         uvcat,
+        uvstop,
         uvtee,
     }) |step| {
         // Link the libraries
