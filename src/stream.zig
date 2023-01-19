@@ -62,8 +62,8 @@ pub const StreamDecls = struct {
         try check(res);
     }
     /// Accept incoming connections
-    pub fn accept(server: anytype, client: *Stream.UV) !void {
-        const res = c.uv_accept(Stream.toUV(server), client);
+    pub fn accept(server: anytype, client: *Stream) !void {
+        const res = c.uv_accept(Stream.toUV(server), client.toUV());
         try check(res);
     }
     /// Read data from an incoming stream

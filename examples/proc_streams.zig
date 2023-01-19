@@ -36,9 +36,9 @@ pub fn main() !void {
     child_stdio[2].flags = uv.IGNORE;
     options.stdio = &child_stdio;
     // Set up the process options
+    options.args = &args;
     options.exit_cb = @ptrCast(uv.Process.ExitCallbackUV, onExit);
     options.file = args[0];
-    options.args = &args;
     // Spawn a process
     try process.spawn(loop, &options);
     try stdout.print("Launched process with ID {}\n", .{process.pid});

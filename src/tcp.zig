@@ -81,7 +81,7 @@ pub const Tcp = extern struct {
     }
     /// Bind the handle to an address and port
     pub fn bind(self: *Self, addr: *const SockAddr, flags: c_uint) !void {
-        const res = c.uv_tcp_bind(self.toUV(), addr.toUV(), flags);
+        const res = c.uv_tcp_bind(self.toUV(), addr.toConstUV(), flags);
         try check(res);
     }
     /// Get the current address to which the handle is bound

@@ -22,6 +22,7 @@ pub fn build(b: *std.build.Builder) !void {
         .dependencies = &.{},
     };
     // Add examples
+    const cgi = b.addExecutable("cgi", "examples/cgi/cgi.zig");
     const detach = b.addExecutable("detach", "examples/detach.zig");
     const dns = b.addExecutable("dns", "examples/dns.zig");
     const locks = b.addExecutable("locks", "examples/locks.zig");
@@ -37,6 +38,7 @@ pub fn build(b: *std.build.Builder) !void {
     const uvtee = b.addExecutable("uvtee", "examples/uvtee.zig");
     // For each example
     inline for (.{
+        cgi,
         detach,
         dns,
         locks,
@@ -75,6 +77,7 @@ pub fn build(b: *std.build.Builder) !void {
     }
     // Add the dependencies
     inline for (.{
+        cgi,
         detach,
         dns,
         lib,
